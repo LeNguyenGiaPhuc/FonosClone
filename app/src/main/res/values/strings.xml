@@ -85,4 +85,21 @@
     <string name="author_hoang_nam_tien" translatable="false">Hoàng Nam Tiến</string>
     <string name="author_hector_malot" translatable="false">Hector Malot</string>
     <string name="author_dale_carnegie" translatable="false">Dale Carnegie</string>
+
+    <string name="explore_title">Explore</string>
+    <string name="search_icon_desc">Search icon</string>
+    <string name="search_hint">Search books, authors, mentors...</string>
+
+    <string name="search_promo_title">New audio content</string>
+    <string name="search_promo_subtitle">Discover audiobooks, summaries, podcasts and relaxing audio in one place.</string>
+    <string name="search_promo_badge">67 Audio Book</string>
+
+    <string name="category_audiobooks">Audiobooks</string>
+    <string name="category_english_books">English Books</string>
+    <string name="category_ebooks">Ebook</string>
+    <string name="category_summaries">Book Summaries</string>
+    <string name="category_children">Children</string>
+    <string name="category_meditation">Meditation</string>
+    <string name="category_sleep_music">Sleep &amp; Music</string>
+    <string name="category_podcast">Podcast</string>
 </resources>

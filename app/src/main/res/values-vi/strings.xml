@@ -77,4 +77,21 @@
     <string name="book_nghe_thuat_tinh_te_title">Nghệ Thuật Tinh Tế</string>
     <string name="book_end_procrastination_title">Thoát Khỏi Trì Hoãn</string>
     <string name="book_dac_nhan_tam_title">Đắc Nhân Tâm</string>
+
+    <string name="explore_title">Khám phá</string>
+    <string name="search_icon_desc">Biểu tượng tìm kiếm</string>
+    <string name="search_hint">Tìm tên sách, tác giả, mentor...</string>
+
+    <string name="search_promo_title">Nội dung âm thanh mới</string>
+    <string name="search_promo_subtitle">Khám phá sách nói, tóm tắt sách, podcast và âm thanh thư giãn trong một ứng dụng.</string>
+    <string name="search_promo_badge">67 Audio Book</string>
+
+    <string name="category_audiobooks">Sách nói</string>
+    <string name="category_english_books">Sách tiếng Anh</string>
+    <string name="category_ebooks">Ebook</string>
+    <string name="category_summaries">Tóm tắt sách</string>
+    <string name="category_children">Thiếu nhi</string>
+    <string name="category_meditation">Thiền</string>
+    <string name="category_sleep_music">Truyện ngủ &amp; Nhạc</string>
+    <string name="category_podcast">Podcast</string>
 </resources>
