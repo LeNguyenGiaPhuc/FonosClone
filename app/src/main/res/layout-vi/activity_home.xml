@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F4FA">
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="72dp"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:background="#FFFFFF">
+
+                <!-- Logo circle + text -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- Orange circle logo (dùng MaterialCardView bo tròn) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        app:cardCornerRadius="19dp"
+                        app:cardBackgroundColor="#F07030"
+                        app:cardElevation="0dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@android:drawable/ic_media_play"
+                            app:tint="#FFFFFF"
+                            android:padding="8dp"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="Logo"/>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="fonos"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#1A1A2E"
+                        android:layout_marginStart="10dp"/>
+                </LinearLayout>
+
+                <!-- Upgrade button — gradient cam dùng MaterialButton -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnUpgrade"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="💎 Nâng cấp >"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp"
+                    app:backgroundTint="#F07030"
+                    app:cornerRadius="18dp"
+                    app:elevation="0dp"
+                    android:layout_marginEnd="10dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"/>
+
+                <!-- Avatar circle -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    app:cardCornerRadius="18dp"
+                    app:cardBackgroundColor="#DDDDDD"
+                    app:cardElevation="0dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@android:drawable/ic_menu_myplaces"
+                        app:tint="#999999"
+                        android:padding="6dp"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="Avatar"/>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- ══════════════════════════════════════
+                 TABS: Sách nói / Ebook / Tóm tắt
+            ══════════════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <!-- Tab active: Sách nói -->
+                <LinearLayout
+                    android:id="@+id/tabSachNoi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:paddingRight="28dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sách nói"
+                        android:textColor="#E84B3A"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="10dp"/>
+
+                    <!-- Indicator line — dùng View với background color -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"
+                        android:background="#E84B3A"/>
+                </LinearLayout>
+
+                <!-- Tab: Ebook -->
+                <LinearLayout
+                    android:id="@+id/tabEbook"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:paddingRight="28dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ebook"
+                        android:textColor="#888888"
+                        android:textSize="15sp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="13dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"
+                        android:background="#00000000"/>
+                </LinearLayout>
+
+                <!-- Tab: Tóm tắt sách -->
+                <LinearLayout
+                    android:id="@+id/tabTomTat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tóm tắt sách"
+                        android:textColor="#888888"
+                        android:textSize="15sp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="13dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"
+                        android:background="#00000000"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Thin divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
+
+            <!-- ══════════════════════════════════════
+                 FEATURED BOOKS — horizontal scroll
+                 Nền tím nhạt #E8E6F5
+            ══════════════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#E8E6F5"
+                android:paddingTop="16dp"
+                android:paddingBottom="20dp">
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:clipToPadding="false">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <!-- Book left (small) -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="135dp"
+                            android:layout_height="200dp"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="4dp"
+                            android:layout_marginEnd="10dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#F5E6C8"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="12dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="END\nPROCRAS\nTINATION"
+                                    android:textColor="#C47A2A"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:gravity="center"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Darius Foroux"
+                                    android:textColor="#8B6040"
+                                    android:textSize="10sp"
+                                    android:layout_marginTop="8dp"
+                                    android:gravity="center"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Book center (featured / large) -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/featuredBook"
+                            android:layout_width="185dp"
+                            android:layout_height="265dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="8dp"
+                            android:layout_marginEnd="10dp"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <!-- Book cover background -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="#E8620A"
+                                    android:orientation="vertical"
+                                    android:padding="14dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="MARK MANSON"
+                                        android:textColor="#FFDDAA"
+                                        android:textSize="9sp"
+                                        android:letterSpacing="0.12"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="NGHỆ THUẬT\nTINH TẾ\nCỦA VIỆC\n&quot;ĐẾCH&quot;\nQUAN TÂM"
+                                        android:textColor="#FFFFFF"
+                                        android:textSize="17sp"
+                                        android:textStyle="bold"
+                                        android:lineSpacingMultiplier="1.1"
+                                        android:layout_marginTop="6dp"/>
+                                </LinearLayout>
+
+                                <!-- Play button bottom right -->
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="46dp"
+                                    android:layout_height="46dp"
+                                    android:layout_gravity="bottom|end"
+                                    android:layout_margin="10dp"
+                                    app:cardCornerRadius="23dp"
+                                    app:cardBackgroundColor="#FFFFFF"
+                                    app:cardElevation="4dp">
+
+                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:src="@android:drawable/ic_media_play"
+                                        app:tint="#E84B3A"
+                                        android:padding="10dp"
+                                        android:scaleType="fitCenter"
+                                        android:contentDescription="Play"/>
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <!-- Badge bottom bar -->
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="34dp"
+                                    android:layout_gravity="bottom"
+                                    android:background="#CC111111"
+                                    android:gravity="center_vertical"
+                                    android:paddingLeft="10dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="🔥  BÁN CHẠY NHẤT"
+                                        android:textColor="#FFFFFF"
+                                        android:textSize="11sp"
+                                        android:textStyle="bold"/>
+                                </LinearLayout>
+
+                            </FrameLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Book right (small) -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="135dp"
+                            android:layout_height="200dp"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="4dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#1A1A2E"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="12dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="THINK\nAND\nGROW\nRICH"
+                                    android:textColor="#F5C518"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold"
+                                    android:gravity="center"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Napoleon Hill"
+                                    android:textColor="#AAAAAA"
+                                    android:textSize="10sp"
+                                    android:layout_marginTop="8dp"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <!-- ══════════════════════════════════════
+                 SECTION: 12 Sách Nói Dành Cho Bạn
+            ══════════════════════════════════════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12 Sách Nói Dành Cho Bạn"
+                    android:textColor="#1A1A2E"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phù hợp với người mới – bấm để nghe ngay"
+                    android:textColor="#888888"
+                    android:textSize="13sp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- Grid row 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <!-- Book item macro: dùng inline MaterialCardView -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="8dp">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent" android:layout_height="148dp"
+                            app:cardCornerRadius="8dp" app:cardElevation="2dp">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                                android:background="#D4A870" android:gravity="center" android:padding="10dp">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Thư\nCho Em" android:textColor="#5C3010"
+                                    android:textSize="14sp" android:textStyle="bold" android:gravity="center"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Thư Cho Em" android:textColor="#1A1A2E"
+                            android:textSize="12sp" android:textStyle="bold"
+                            android:maxLines="2" android:layout_marginTop="6dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Hoàng Nam Tiến" android:textColor="#999999" android:textSize="11sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="8dp">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent" android:layout_height="148dp"
+                            app:cardCornerRadius="8dp" app:cardElevation="2dp">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                                android:background="#1A1A2E" android:gravity="center" android:padding="10dp">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="THINK\nAND\nGROW\nRICH" android:textColor="#F5C518"
+                                    android:textSize="14sp" android:textStyle="bold" android:gravity="center"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Think And Grow Rich" android:textColor="#1A1A2E"
+                            android:textSize="12sp" android:textStyle="bold"
+                            android:maxLines="2" android:layout_marginTop="6dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Napoleon Hill" android:textColor="#999999" android:textSize="11sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent" android:layout_height="148dp"
+                            app:cardCornerRadius="8dp" app:cardElevation="2dp">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                                android:background="#2D7A4F" android:gravity="center" android:padding="10dp">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Không\nGia Đình" android:textColor="#CCFFDD"
+                                    android:textSize="14sp" android:textStyle="bold" android:gravity="center"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Không Gia Đình" android:textColor="#1A1A2E"
+                            android:textSize="12sp" android:textStyle="bold"
+                            android:maxLines="2" android:layout_marginTop="6dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Hector Malot" android:textColor="#999999" android:textSize="11sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Grid row 2 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="18dp">
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="8dp">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent" android:layout_height="148dp"
+                            app:cardCornerRadius="8dp" app:cardElevation="2dp">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                                android:background="#E8620A" android:gravity="center" android:padding="10dp">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Nghệ\nThuật\nTinh Tế" android:textColor="#FFFFFF"
+                                    android:textSize="13sp" android:textStyle="bold" android:gravity="center"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Nghệ Thuật Tinh Tế" android:textColor="#1A1A2E"
+                            android:textSize="12sp" android:textStyle="bold"
+                            android:maxLines="2" android:layout_marginTop="6dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Mark Manson" android:textColor="#999999" android:textSize="11sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical" android:layout_marginEnd="8dp">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent" android:layout_height="148dp"
+                            app:cardCornerRadius="8dp" app:cardElevation="2dp">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                                android:background="#F5E0C0" android:gravity="center" android:padding="10dp">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="END\nPROCRAS\nTINATION" android:textColor="#8B5010"
+                                    android:textSize="13sp" android:textStyle="bold" android:gravity="center"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="End Procrastination" android:textColor="#1A1A2E"
+                            android:textSize="12sp" android:textStyle="bold"
+                            android:maxLines="2" android:layout_marginTop="6dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Darius Foroux" android:textColor="#999999" android:textSize="11sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent" android:layout_height="148dp"
+                            app:cardCornerRadius="8dp" app:cardElevation="2dp">
+                            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                                android:background="#3A5FA0" android:gravity="center" android:padding="10dp">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                    android:text="Đắc\nNhân\nTâm" android:textColor="#FFFFFF"
+                                    android:textSize="14sp" android:textStyle="bold" android:gravity="center"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Đắc Nhân Tâm" android:textColor="#1A1A2E"
+                            android:textSize="12sp" android:textStyle="bold"
+                            android:maxLines="2" android:layout_marginTop="6dp"/>
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="Dale Carnegie" android:textColor="#999999" android:textSize="11sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- See all button — inline style, không cần drawable -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSeeAll"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:text="Xem tất cả"
+                    android:textColor="#E84B3A"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#FFFFFF"
+                    app:strokeColor="#E84B3A"
+                    app:strokeWidth="1.5dp"
+                    app:cornerRadius="10dp"
+                    app:elevation="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"/>
+
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="12dp"
+                android:background="#F5F4FA"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ══════════════════════════════════════════
+         BOTTOM NAVIGATION — inline bo góc trên
+    ══════════════════════════════════════════ -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_gravity="bottom"
+        app:cardCornerRadius="0dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardElevation="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <!-- Nav: Sách (active) -->
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
+                android:layout_weight="1" android:orientation="vertical"
+                android:gravity="center" android:id="@+id/navSach"
+                android:clickable="true" android:focusable="true">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_agenda" app:tint="#E84B3A"
+                    android:contentDescription="Sách"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Sách" android:textColor="#E84B3A"
+                    android:textSize="11sp" android:textStyle="bold" android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+            <!-- Nav: PodCourse -->
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
+                android:layout_weight="1" android:orientation="vertical"
+                android:gravity="center" android:id="@+id/navPodCourse"
+                android:clickable="true" android:focusable="true">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                    android:src="@android:drawable/ic_media_play" app:tint="#AAAAAA"
+                    android:contentDescription="PodCourse"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="PodCourse" android:textColor="#AAAAAA"
+                    android:textSize="11sp" android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+            <!-- Nav: Khám phá -->
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
+                android:layout_weight="1" android:orientation="vertical"
+                android:gravity="center" android:id="@+id/navKhamPha"
+                android:clickable="true" android:focusable="true">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_search" app:tint="#AAAAAA"
+                    android:contentDescription="Khám phá"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Khám phá" android:textColor="#AAAAAA"
+                    android:textSize="11sp" android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+            <!-- Nav: Thử thách -->
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
+                android:layout_weight="1" android:orientation="vertical"
+                android:gravity="center" android:id="@+id/navThuThach"
+                android:clickable="true" android:focusable="true">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_share" app:tint="#AAAAAA"
+                    android:contentDescription="Thử thách"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Thử thách" android:textColor="#AAAAAA"
+                    android:textSize="11sp" android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+            <!-- Nav: Thư viện -->
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"
+                android:layout_weight="1" android:orientation="vertical"
+                android:gravity="center" android:id="@+id/navThuVien"
+                android:clickable="true" android:focusable="true">
+                <ImageView android:layout_width="24dp" android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_sort_by_size" app:tint="#AAAAAA"
+                    android:contentDescription="Thư viện"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Thư viện" android:textColor="#AAAAAA"
+                    android:textSize="11sp" android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
