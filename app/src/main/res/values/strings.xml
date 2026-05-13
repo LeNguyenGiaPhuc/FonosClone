@@ -1,38 +1,88 @@
 <resources>
-    <string name="app_name">FonosClone</string>
-    <string name="app_name_lowercase">fonos</string>
-    <string name="upgrade">💎 Upgrade ></string>
+    <string name="app_name" translatable="false">67 Audio Book</string>
+    <string name="app_name_lowercase" translatable="false">67 audio book</string>
+
+    <!-- Login -->
+    <string name="logo_desc">App logo</string>
+    <string name="login_subtitle">Listen &amp; get rewards every day</string>
+    <string name="login_title">Log in</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="email_icon_desc">Email icon</string>
+    <string name="password_icon_desc">Password icon</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="login_button">Log in</string>
+    <string name="or">or</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="no_account">No account yet? </string>
+    <string name="register_link">Register</string>
+
+    <!-- Register -->
+    <string name="back">Back</string>
+    <string name="register_title">Create account</string>
+    <string name="register_subtitle">Join 1.2 million members</string>
+    <string name="full_name_label">Full name</string>
+    <string name="full_name_hint">Nguyen Van A</string>
+    <string name="full_name_icon_desc">Full name icon</string>
+    <string name="email_label">Email</string>
+    <string name="email_example_hint">example@email.com</string>
+    <string name="password_label">Password</string>
+    <string name="password_min_hint">At least 6 characters</string>
+    <string name="confirm_password_label">Confirm password</string>
+    <string name="confirm_password_hint">Re-enter password</string>
+    <string name="agree_with">I agree to the </string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="register_button">Register</string>
+    <string name="already_have_account">Already have an account? </string>
+    <string name="login_link">Log in</string>
+
+    <!-- Home top bar -->
+    <string name="upgrade">Upgrade</string>
     <string name="avatar">Avatar</string>
+
+    <!-- Home tabs -->
     <string name="audiobooks">Audiobooks</string>
     <string name="ebooks">Ebooks</string>
     <string name="book_summaries">Summaries</string>
-    <string name="featured_book_title">THE SUBTLE\nART OF\nNOT GIVING\nA F*CK</string>
+
+    <!-- Featured section -->
+    <string name="featured_book_title">THE SUBTLE ART OF\nNOT GIVING\nA F*CK</string>
     <string name="play">Play</string>
-    <string name="best_seller">🔥  BEST SELLER</string>
+    <string name="best_seller">BEST SELLER</string>
+
+    <!-- Recommended section -->
     <string name="recommended_for_you">12 Audiobooks For You</string>
-    <string name="recommended_subtitle">Perfect for beginners – tap to listen</string>
+    <string name="recommended_subtitle">Perfect for beginners — tap to listen</string>
     <string name="see_all">See all</string>
+
+    <!-- Bottom navigation -->
     <string name="nav_books">Books</string>
     <string name="nav_podcourse">PodCourse</string>
     <string name="nav_explore">Explore</string>
     <string name="nav_challenges">Challenges</string>
     <string name="nav_library">Library</string>
+
+    <!-- Book display text -->
     <string name="book_end_procrastination">END\nPROCRAS\nTINATION</string>
-    <string name="author_darius_foroux">Darius Foroux</string>
-    <string name="author_mark_manson">Mark Manson</string>
     <string name="book_think_and_grow_rich">THINK\nAND\nGROW\nRICH</string>
-    <string name="author_napoleon_hill">Napoleon Hill</string>
-    <string name="book_thu_cho_em">Thư\nCho Em</string>
-    <string name="book_thu_cho_em_title">Thư Cho Em</string>
-    <string name="author_hoang_nam_tien">Hoàng Nam Tiến</string>
-    <string name="book_think_and_grow_rich_title">Think And Grow Rich</string>
+    <string name="book_thu_cho_em">Thu\nCho Em</string>
     <string name="book_khong_gia_dinh">Không\nGia Đình</string>
+    <string name="book_nghe_thuat_tinh_te">SUBTLE\nART</string>
+    <string name="book_dac_nhan_tam">HOW TO\nWIN\nFRIENDS</string>
+
+    <!-- Book titles -->
+    <string name="book_thu_cho_em_title">Thu Cho Em</string>
+    <string name="book_think_and_grow_rich_title">Think And Grow Rich</string>
     <string name="book_khong_gia_dinh_title">Không Gia Đình</string>
-    <string name="author_hector_malot">Hector Malot</string>
-    <string name="book_nghe_thuat_tinh_te">Nghệ\nThuật\nTinh Tế</string>
-    <string name="book_nghe_thuat_tinh_te_title">Nghệ Thuật Tinh Tế</string>
+    <string name="book_nghe_thuat_tinh_te_title">The Subtle Art</string>
     <string name="book_end_procrastination_title">End Procrastination</string>
-    <string name="book_dac_nhan_tam">Đắc\nNhân\nTâm</string>
-    <string name="book_dac_nhan_tam_title">Đắc Nhân Tâm</string>
-    <string name="author_dale_carnegie">Dale Carnegie</string>
+    <string name="book_dac_nhan_tam_title">How To Win Friends</string>
+
+    <!-- Authors -->
+    <string name="author_darius_foroux" translatable="false">Darius Foroux</string>
+    <string name="author_mark_manson" translatable="false">Mark Manson</string>
+    <string name="author_napoleon_hill" translatable="false">Napoleon Hill</string>
+    <string name="author_hoang_nam_tien" translatable="false">Hoàng Nam Tiến</string>
+    <string name="author_hector_malot" translatable="false">Hector Malot</string>
+    <string name="author_dale_carnegie" translatable="false">Dale Carnegie</string>
 </resources>

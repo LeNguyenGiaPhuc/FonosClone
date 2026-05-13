@@ -1,38 +1,80 @@
 <resources>
-    <string name="app_name">FonosClone</string>
-    <string name="app_name_lowercase">fonos</string>
-    <string name="upgrade">💎 Nâng cấp ></string>
-    <string name="avatar">Avatar</string>
+    <string name="app_name" translatable="false">67 Audio Book</string>
+    <string name="app_name_lowercase" translatable="false">67 audio book</string>\
+
+    <!-- Login -->
+    <string name="logo_desc">Logo ứng dụng</string>
+    <string name="login_subtitle">Nghe và nhận thưởng mỗi ngày</string>
+    <string name="login_title">Đăng nhập</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="email_icon_desc">Biểu tượng email</string>
+    <string name="password_icon_desc">Biểu tượng mật khẩu</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="login_button">Đăng nhập</string>
+    <string name="or">hoặc</string>
+    <string name="continue_with_google">Tiếp tục với Google</string>
+    <string name="no_account">Chưa có tài khoản? </string>
+    <string name="register_link">Đăng ký</string>
+
+    <!-- Register -->
+    <string name="back">Quay lại</string>
+    <string name="register_title">Tạo tài khoản</string>
+    <string name="register_subtitle">Tham gia cùng 1.2 triệu thành viên</string>
+    <string name="full_name_label">Họ và tên</string>
+    <string name="full_name_hint">Nguyễn Văn A</string>
+    <string name="full_name_icon_desc">Biểu tượng họ và tên</string>
+    <string name="email_label">Email</string>
+    <string name="email_example_hint">vidu@email.com</string>
+    <string name="password_label">Mật khẩu</string>
+    <string name="password_min_hint">Tối thiểu 6 ký tự</string>
+    <string name="confirm_password_label">Xác nhận mật khẩu</string>
+    <string name="confirm_password_hint">Nhập lại mật khẩu</string>
+    <string name="agree_with">Tôi đồng ý với </string>
+    <string name="terms_of_service">Điều khoản dịch vụ</string>
+    <string name="register_button">Đăng ký</string>
+    <string name="already_have_account">Bạn đã có tài khoản? </string>
+    <string name="login_link">Đăng nhập</string>
+
+    <!-- Home top bar -->
+    <string name="upgrade">Nâng cấp</string>
+    <string name="avatar">Ảnh đại diện</string>
+
+    <!-- Home tabs -->
     <string name="audiobooks">Sách nói</string>
-    <string name="ebooks">Ebook</string>
+    <string name="ebooks">Sách điện tử</string>
     <string name="book_summaries">Tóm tắt sách</string>
-    <string name="featured_book_title">NGHỆ THUẬT\nTINH TẾ\nCỦA VIỆC\n\"ĐẾCH\"\nQUAN TÂM</string>
-    <string name="play">Nghe</string>
-    <string name="best_seller">🔥  BÁN CHẠY NHẤT</string>
+
+    <!-- Featured section -->
+    <string name="featured_book_title">NGHỆ THUẬT\nTINH TẾ CỦA VIỆC\nĐẾCH QUAN TÂM</string>
+    <string name="play">Phát</string>
+    <string name="best_seller"> BÁN CHẠY NHẤT</string>
+
+    <!-- Recommended section -->
     <string name="recommended_for_you">12 Sách Nói Dành Cho Bạn</string>
-    <string name="recommended_subtitle">Phù hợp với người mới – bấm để nghe ngay</string>
+    <string name="recommended_subtitle">Phù hợp với người mới — bấm để nghe ngay</string>
     <string name="see_all">Xem tất cả</string>
+
+    <!-- Bottom navigation -->
     <string name="nav_books">Sách</string>
     <string name="nav_podcourse">PodCourse</string>
     <string name="nav_explore">Khám phá</string>
     <string name="nav_challenges">Thử thách</string>
     <string name="nav_library">Thư viện</string>
-    <string name="book_end_procrastination">END\nPROCRAS\nTINATION</string>
-    <string name="author_darius_foroux">Darius Foroux</string>
-    <string name="author_mark_manson">Mark Manson</string>
-    <string name="book_think_and_grow_rich">THINK\nAND\nGROW\nRICH</string>
-    <string name="author_napoleon_hill">Napoleon Hill</string>
+
+    <!-- Book display text -->
+    <string name="book_end_procrastination">THOÁT\nKHỎI\nTRÌ HOÃN</string>
+    <string name="book_think_and_grow_rich">NGHĨ\nGIÀU\nLÀM\nGIÀU</string>
     <string name="book_thu_cho_em">Thư\nCho Em</string>
-    <string name="book_thu_cho_em_title">Thư Cho Em</string>
-    <string name="author_hoang_nam_tien">Hoàng Nam Tiến</string>
-    <string name="book_think_and_grow_rich_title">Think And Grow Rich</string>
     <string name="book_khong_gia_dinh">Không\nGia Đình</string>
+    <string name="book_nghe_thuat_tinh_te">NGHỆ\nTHUẬT\nTINH TẾ</string>
+    <string name="book_dac_nhan_tam">ĐẮC\nNHÂN\nTÂM</string>
+
+    <!-- Book titles -->
+    <string name="book_thu_cho_em_title">Thư Cho Em</string>
+    <string name="book_think_and_grow_rich_title">Nghĩ Giàu Làm Giàu</string>
     <string name="book_khong_gia_dinh_title">Không Gia Đình</string>
-    <string name="author_hector_malot">Hector Malot</string>
-    <string name="book_nghe_thuat_tinh_te">Nghệ\nThuật\nTinh Tế</string>
     <string name="book_nghe_thuat_tinh_te_title">Nghệ Thuật Tinh Tế</string>
-    <string name="book_end_procrastination_title">End Procrastination</string>
-    <string name="book_dac_nhan_tam">Đắc\nNhân\nTâm</string>
+    <string name="book_end_procrastination_title">Thoát Khỏi Trì Hoãn</string>
     <string name="book_dac_nhan_tam_title">Đắc Nhân Tâm</string>
-    <string name="author_dale_carnegie">Dale Carnegie</string>
 </resources>

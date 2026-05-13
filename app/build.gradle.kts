@@ -4,11 +4,7 @@ plugins {
 
 android {
     namespace = "hcmute.com.fonosclone"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "hcmute.com.fonosclone"
@@ -33,6 +29,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    compileSdkMinor = 1
 }
 
 dependencies {

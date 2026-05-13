@@ -1,53 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:paddingLeft="28dp"
-    android:paddingRight="28dp"
+    android:fillViewport="true"
+    android:paddingStart="28dp"
+    android:paddingEnd="28dp"
     android:paddingBottom="24dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="8dp">
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/btnBack"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
+                android:background="@drawable/circle_white"
+                android:contentDescription="@string/back"
                 android:padding="4dp"
                 android:src="@android:drawable/ic_media_previous"
-                android:background="@drawable/circle_white"
-                android:contentDescription="Quay lại"
                 app:tint="#1A2B5F" />
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tạo tài khoản"
+                android:gravity="center"
+                android:text="@string/register_title"
                 android:textColor="#FFFFFF"
                 android:textSize="22sp"
-                android:textStyle="bold"
-                android:gravity="center"/>
+                android:textStyle="bold" />
 
-            <View android:layout_width="40dp" android:layout_height="40dp"/>
+            <View
+                android:layout_width="48dp"
+                android:layout_height="48dp" />
         </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tham gia cùng 1.2 triệu thành viên"
+            android:layout_marginBottom="16dp"
+            android:text="@string/register_subtitle"
             android:textColor="#CCE0FF"
-            android:textSize="13sp"
-            android:layout_marginBottom="16dp"/>
+            android:textSize="13sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -59,214 +67,222 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Họ và tên"
+                android:layout_marginBottom="6dp"
+                android:text="@string/full_name_label"
                 android:textColor="#6B7A9F"
-                android:textSize="13sp"
-                android:layout_marginBottom="6dp"/>
+                android:textSize="13sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginBottom="12dp"
                 android:background="@drawable/input_bg"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingLeft="14dp"
-                android:paddingRight="14dp"
-                android:layout_marginBottom="12dp">
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@android:drawable/ic_menu_myplaces"
-                    android:alpha="0.5"/>
+                    android:alpha="0.5"
+                    android:contentDescription="@string/full_name_icon_desc"
+                    android:src="@android:drawable/ic_menu_myplaces" />
 
                 <EditText
                     android:id="@+id/etFullName"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:autofillHints="name"
                     android:background="@null"
-                    android:hint="Nguyễn Văn A"
-                    android:textColorHint="#AABBCC"
-                    android:textColor="#1A2B5F"
-                    android:textSize="14sp"
+                    android:hint="@string/full_name_hint"
                     android:inputType="textPersonName"
-                    android:paddingLeft="10dp"
-                    android:singleLine="true"/>
+                    android:paddingStart="10dp"
+                    android:singleLine="true"
+                    android:textColor="#1A2B5F"
+                    android:textColorHint="#AABBCC"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Email"
+                android:layout_marginBottom="6dp"
+                android:text="@string/email_label"
                 android:textColor="#6B7A9F"
-                android:textSize="13sp"
-                android:layout_marginBottom="6dp"/>
+                android:textSize="13sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginBottom="12dp"
                 android:background="@drawable/input_bg"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingLeft="14dp"
-                android:paddingRight="14dp"
-                android:layout_marginBottom="12dp">
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@android:drawable/ic_dialog_email"
-                    android:alpha="0.5"/>
+                    android:alpha="0.5"
+                    android:contentDescription="@string/email_icon_desc"
+                    android:src="@android:drawable/ic_dialog_email" />
 
                 <EditText
                     android:id="@+id/etEmail"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:autofillHints="emailAddress"
                     android:background="@null"
-                    android:hint="vidu@email.com"
-                    android:textColorHint="#AABBCC"
-                    android:textColor="#1A2B5F"
-                    android:textSize="14sp"
+                    android:hint="@string/email_example_hint"
                     android:inputType="textEmailAddress"
-                    android:paddingLeft="10dp"
-                    android:singleLine="true"/>
+                    android:paddingStart="10dp"
+                    android:singleLine="true"
+                    android:textColor="#1A2B5F"
+                    android:textColorHint="#AABBCC"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mật khẩu"
+                android:layout_marginBottom="6dp"
+                android:text="@string/password_label"
                 android:textColor="#6B7A9F"
-                android:textSize="13sp"
-                android:layout_marginBottom="6dp"/>
+                android:textSize="13sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginBottom="12dp"
                 android:background="@drawable/input_bg"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingLeft="14dp"
-                android:paddingRight="14dp"
-                android:layout_marginBottom="12dp">
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@android:drawable/ic_lock_lock"
-                    android:alpha="0.5"/>
+                    android:alpha="0.5"
+                    android:contentDescription="@string/password_icon_desc"
+                    android:src="@android:drawable/ic_lock_lock" />
 
                 <EditText
                     android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:autofillHints="newPassword"
                     android:background="@null"
-                    android:hint="Tối thiểu 6 ký tự"
-                    android:textColorHint="#AABBCC"
-                    android:textColor="#1A2B5F"
-                    android:textSize="14sp"
+                    android:hint="@string/password_min_hint"
                     android:inputType="textPassword"
-                    android:paddingLeft="10dp"
-                    android:singleLine="true"/>
+                    android:paddingStart="10dp"
+                    android:singleLine="true"
+                    android:textColor="#1A2B5F"
+                    android:textColorHint="#AABBCC"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Xác nhận mật khẩu"
+                android:layout_marginBottom="6dp"
+                android:text="@string/confirm_password_label"
                 android:textColor="#6B7A9F"
-                android:textSize="13sp"
-                android:layout_marginBottom="6dp"/>
+                android:textSize="13sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginBottom="16dp"
                 android:background="@drawable/input_bg"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingLeft="14dp"
-                android:paddingRight="14dp"
-                android:layout_marginBottom="16dp">
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@android:drawable/ic_lock_lock"
-                    android:alpha="0.5"/>
+                    android:alpha="0.5"
+                    android:contentDescription="@string/password_icon_desc"
+                    android:src="@android:drawable/ic_lock_lock" />
 
                 <EditText
                     android:id="@+id/etConfirmPassword"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:autofillHints="newPassword"
                     android:background="@null"
-                    android:hint="Nhập lại mật khẩu"
-                    android:textColorHint="#AABBCC"
-                    android:textColor="#1A2B5F"
-                    android:textSize="14sp"
+                    android:hint="@string/confirm_password_hint"
                     android:inputType="textPassword"
-                    android:paddingLeft="10dp"
-                    android:singleLine="true"/>
+                    android:paddingStart="10dp"
+                    android:singleLine="true"
+                    android:textColor="#1A2B5F"
+                    android:textColorHint="#AABBCC"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="16dp">
+                android:orientation="horizontal">
 
                 <CheckBox
                     android:id="@+id/cbTerms"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:buttonTint="#F07830"/>
+                    android:buttonTint="#F07830" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tôi đồng ý với "
+                    android:text="@string/agree_with"
                     android:textColor="#6B7A9F"
-                    android:textSize="13sp"/>
+                    android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/tvTerms"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
-                    android:text="Điều khoản dịch vụ"
-                    android:textColor="#F07830"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"/>
+                    android:gravity="center_vertical"
+                    android:text="@string/terms_of_service"
+                    android:textColor="#F07830"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/btnRegister"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:text="Đăng ký"
+                android:background="@drawable/btn_orange"
+                android:stateListAnimator="@null"
+                android:text="@string/register_button"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:background="@drawable/btn_orange"
-                android:stateListAnimator="@null"/>
+                android:textStyle="bold" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
             android:gravity="center"
-            android:layout_marginTop="16dp">
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bạn đã có tài khoản? "
+                android:text="@string/already_have_account"
                 android:textColor="#CCE0FF"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvGoLogin"
@@ -275,10 +291,12 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
-                android:text="Đăng nhập"
+                android:text="@string/login_link"
                 android:textColor="#F07830"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-</LinearLayout>
+    </LinearLayout>
+
+</ScrollView>
