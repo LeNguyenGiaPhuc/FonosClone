@@ -94,4 +94,23 @@
     <string name="category_meditation">Thiền</string>
     <string name="category_sleep_music">Truyện ngủ &amp; Nhạc</string>
     <string name="category_podcast">Podcast</string>
+    <!-- Thử thách -->
+    <string name="challenges_title">Thử thách</string>
+    <string name="diamond_points">Điểm Kim Cương</string>
+    <string name="points_count">1250</string>
+    <string name="daily_mission">Nhiệm vụ hàng ngày</string>
+    <string name="listen_30m">Nghe trong 30 phút</string>
+    <string name="mission_progress">15/30 phút</string>
+    <string name="claim_reward">Nhận thưởng</string>
+    <string name="weekly_challenge">Thử thách tuần</string>
+    <string name="complete_book">Hoàn thành 1 sách nói</string>
+    <string name="challenge_status">Đang thực hiện</string>
+
+    <!-- Thư viện -->
+    <string name="library_title">Thư viện</string>
+    <string name="tab_downloaded">Đã tải</string>
+    <string name="tab_purchased">Đã mua</string>
+    <string name="tab_favorite">Yêu thích</string>
+    <string name="no_books_yet">Chưa có sách nào trong thư viện</string>
+    <string name="browse_store">Khám phá cửa hàng</string>
 </resources>

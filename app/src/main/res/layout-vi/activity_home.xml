@@ -7,14 +7,14 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient">
 
-    <!-- MAIN CONTENT -->
+    <!-- NỘI DUNG CHÍNH -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="72dp"
         android:orientation="vertical">
 
-        <!-- TOP BAR -->
+        <!-- THANH ĐẦU TRANG -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -147,7 +147,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- SCROLL CONTENT -->
+        <!-- NỘI DUNG CUỘN -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -164,7 +164,7 @@
                 android:paddingTop="14dp"
                 android:paddingBottom="20dp">
 
-                <!-- WHITE CONTENT CARD -->
+                <!-- THẺ NỘI DUNG TRẮNG -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -173,7 +173,7 @@
                     android:paddingTop="18dp"
                     android:paddingBottom="18dp">
 
-                    <!-- FEATURED -->
+                    <!-- NỔI BẬT -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -286,7 +286,7 @@
                         </HorizontalScrollView>
                     </LinearLayout>
 
-                    <!-- GRID SECTION -->
+                    <!-- PHẦN LƯỚI -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -294,7 +294,7 @@
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
 
-                        <!-- row 1 -->
+                        <!-- hàng 1 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -446,7 +446,7 @@
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- row 2 -->
+                        <!-- hàng 2 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -518,7 +518,7 @@
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
-                                        android:background="#E8D7B5"
+                                        android:background="#F0EAD6"
                                         android:gravity="center"
                                         android:padding="10dp">
 
@@ -615,7 +615,7 @@
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>
 
-    <!-- BOTTOM NAV -->
+    <!-- THANH ĐIỀU HƯỚNG DƯỚI -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="72dp"
@@ -630,11 +630,14 @@
             android:orientation="horizontal">
 
             <LinearLayout
+                android:id="@+id/navSach"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -654,11 +657,14 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/navPodCourse"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -677,11 +683,14 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/navKhamPha"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -700,11 +709,14 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/navThuThach"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -723,11 +735,14 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/navThuVien"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="24dp"

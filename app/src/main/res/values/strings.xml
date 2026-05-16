@@ -102,4 +102,23 @@
     <string name="category_meditation">Meditation</string>
     <string name="category_sleep_music">Sleep &amp; Music</string>
     <string name="category_podcast">Podcast</string>
+    <!-- Challenges -->
+    <string name="challenges_title">Challenges</string>
+    <string name="diamond_points">Diamond Points</string>
+    <string name="points_count">1250</string>
+    <string name="daily_mission">Daily Mission</string>
+    <string name="listen_30m">Listen for 30 minutes</string>
+    <string name="mission_progress">15/30 min</string>
+    <string name="claim_reward">Claim Reward</string>
+    <string name="weekly_challenge">Weekly Challenge</string>
+    <string name="complete_book">Complete 1 audiobook</string>
+    <string name="challenge_status">In Progress</string>
+
+    <!-- Library -->
+    <string name="library_title">Library</string>
+    <string name="tab_downloaded">Downloaded</string>
+    <string name="tab_purchased">Purchased</string>
+    <string name="tab_favorite">Favorite</string>
+    <string name="no_books_yet">No books in your library yet</string>
+    <string name="browse_store">Browse Store</string>
 </resources>
