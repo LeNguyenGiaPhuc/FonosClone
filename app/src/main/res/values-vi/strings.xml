@@ -113,4 +113,44 @@
     <string name="tab_favorite">Yêu thích</string>
     <string name="no_books_yet">Chưa có sách nào trong thư viện</string>
     <string name="browse_store">Khám phá cửa hàng</string>
+
+    <!-- PodCourse -->
+    <string name="did_you_know">Bạn có biết?</string>
+    <string name="podcourse_banner_line1">Sau khi mua nội dung trên 67 Audio Book, bạn được</string>
+    <string name="podcourse_banner_line2_highlight">sở hữu vĩnh viễn</string>
+    <string name="podcourse_banner_line2_rest">, kể cả khi hủy gói.</string>
+    <string name="arrow_right">›</string>
+
+    <string name="podcourse_free_header">PodCourse miễn phí</string>
+    <string name="for_members_only">Dành Cho Hội Viên</string>
+    <string name="see_all_arrow">›</string>
+
+    <string name="podcourse_ai_title">AI Dành Cho Người Mới Bắt Đầu</string>
+    <string name="podcourse_manage_title">Quản Lý Cho Người Lần Đầu Làm Lãnh Đạo</string>
+    <string name="podcourse_finance_title">Tư Duy Tài Chính Cá Nhân Cho Người Mới</string>
+
+    <string name="podcourse_ai_short">AI Dành Cho Người Mới Bắt Đầu</string>
+    <string name="podcourse_manage_short">Quản Lý Cho Người Lần Đầu Làm Lãnh Đạo</string>
+    <string name="podcourse_finance_short">Tư Duy Tài Chính Cá Nhân Cho Người Mới</string>
+
+    <string name="author_nam_nguyen">Nam Nguyễn</string>
+    <string name="author_vu_duc_tri_the">Vũ Đức Trí Thể</string>
+    <string name="author_tran_viet_quan">Trần Việt Quân</string>
+
+    <string name="author_nam_nguyen_rating">Nam Nguyễn · 4.8 (120)</string>
+    <string name="author_vu_duc_tri_the_rating">Vũ Đức Trí Thể · 4.7 (96)</string>
+    <string name="author_tran_viet_quan_rating">Trần Việt Quân · 4.7 (83)</string>
+
+    <string name="rating_ai">★ 4.8 (120)</string>
+    <string name="rating_manage">★ 4.7 (96)</string>
+    <string name="rating_finance">★ 4.7 (83)</string>
+
+    <string name="member_badge">HỘI VIÊN</string>
+    <string name="most_listened">Nghe nhiều nhất</string>
+    <string name="featured_courses">Khóa học nổi bật</string>
+
+    <string name="emoji_user">👤</string>
+    <string name="emoji_grad">🎓</string>
+    <string name="emoji_chart">📊</string>
+    <string name="emoji_money">💰</string>
 </resources>

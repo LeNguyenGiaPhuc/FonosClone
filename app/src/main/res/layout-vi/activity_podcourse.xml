@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    ╔══════════════════════════════════════════════════════╗
-    ║  activity_podcourse.xml                              ║
-    ║  ✅ 1 file duy nhất — không cần drawable XML nào     ║
-    ║  Requires: Material Components 1.11.0                ║
-    ╚══════════════════════════════════════════════════════╝
--->
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FDF0EE">

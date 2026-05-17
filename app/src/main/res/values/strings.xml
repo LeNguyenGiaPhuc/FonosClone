@@ -121,4 +121,44 @@
     <string name="tab_favorite">Favorite</string>
     <string name="no_books_yet">No books in your library yet</string>
     <string name="browse_store">Browse Store</string>
+
+    <!-- PodCourse -->
+    <string name="did_you_know">Did you know?</string>
+    <string name="podcourse_banner_line1">After purchasing content on 67 Audio Book, you get</string>
+    <string name="podcourse_banner_line2_highlight">lifetime access</string>
+    <string name="podcourse_banner_line2_rest">, even if you cancel your plan.</string>
+    <string name="arrow_right">›</string>
+
+    <string name="podcourse_free_header">Free PodCourse</string>
+    <string name="for_members_only">For Members</string>
+    <string name="see_all_arrow">›</string>
+
+    <string name="podcourse_ai_title">AI for Beginners</string>
+    <string name="podcourse_manage_title">Management for First-Time Leaders</string>
+    <string name="podcourse_finance_title">Personal Finance Thinking for Beginners</string>
+
+    <string name="podcourse_ai_short">AI for Beginners</string>
+    <string name="podcourse_manage_short">Management for First-Time Leaders</string>
+    <string name="podcourse_finance_short">Personal Finance Thinking for Beginners</string>
+
+    <string name="author_nam_nguyen">Nam Nguyen</string>
+    <string name="author_vu_duc_tri_the">Vu Duc Tri The</string>
+    <string name="author_tran_viet_quan">Tran Viet Quan</string>
+
+    <string name="author_nam_nguyen_rating">Nam Nguyen · 4.8 (120)</string>
+    <string name="author_vu_duc_tri_the_rating">Vu Duc Tri The · 4.7 (96)</string>
+    <string name="author_tran_viet_quan_rating">Tran Viet Quan · 4.7 (83)</string>
+
+    <string name="rating_ai">★ 4.8 (120)</string>
+    <string name="rating_manage">★ 4.7 (96)</string>
+    <string name="rating_finance">★ 4.7 (83)</string>
+
+    <string name="member_badge">MEMBER</string>
+    <string name="most_listened">Most listened</string>
+    <string name="featured_courses">Featured Courses</string>
+
+    <string name="emoji_user">👤</string>
+    <string name="emoji_grad">🎓</string>
+    <string name="emoji_chart">📊</string>
+    <string name="emoji_money">💰</string>
 </resources>
