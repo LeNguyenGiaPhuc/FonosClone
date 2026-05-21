@@ -1,14 +1,14 @@
 package hcmute.com.fonosclone;
 import android.os.Bundle;
 
-public class LibraryActivity extends BaseActivity {
+public class PodcourseActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_library);
+        setContentView(R.layout.activity_podcourse);
 
         applySystemBarPadding(R.id.main);
-        setupBottomNavigation(NAV_LIBRARY);
+        setupBottomNavigation(NAV_PODCOURSE);
     }
 }
