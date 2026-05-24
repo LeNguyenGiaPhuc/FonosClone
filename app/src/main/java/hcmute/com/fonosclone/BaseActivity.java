@@ -64,7 +64,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void setupUserMenu() {
-        ImageView ivAvatar = findViewById(R.id.ivAvatar);
+        View ivAvatar = findViewById(R.id.ivAvatar);
         if (ivAvatar != null) {
             ivAvatar.setOnClickListener(v -> {
                 PopupMenu popup = new PopupMenu(this, v);
