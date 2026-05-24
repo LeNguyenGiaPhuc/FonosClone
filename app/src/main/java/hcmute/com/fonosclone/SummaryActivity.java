@@ -1,15 +1,17 @@
 package hcmute.com.fonosclone;
+
 import android.os.Bundle;
 
-public class ChallengesActivity extends BaseActivity {
+public class SummaryActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_challenges);
+        setContentView(R.layout.activity_summaries);
 
         applySystemBarPadding(R.id.main);
-        setupBottomNavigation(NAV_CHALLENGES);
+        setupBottomNavigation(NAV_BOOKS);
+        setupTabs(TAB_SUMMARIES);
         setupUserMenu();
     }
 }

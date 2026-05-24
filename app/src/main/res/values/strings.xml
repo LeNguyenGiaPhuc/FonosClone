@@ -53,6 +53,10 @@
     <!-- Recommended section -->
     <string name="recommended_for_you">12 Audiobooks For You</string>
     <string name="recommended_subtitle">Perfect for beginners — tap to listen</string>
+    <string name="recommended_ebooks">12 Ebooks For You</string>
+    <string name="recommended_ebooks_subtitle">Read anywhere, anytime — tap to open</string>
+    <string name="recommended_summaries">12 Summaries For You</string>
+    <string name="recommended_summaries_subtitle">Key insights in 15 minutes — tap to read</string>
     <string name="see_all">See all</string>
 
     <!-- Bottom navigation -->
@@ -161,4 +165,9 @@
     <string name="emoji_grad">🎓</string>
     <string name="emoji_chart">📊</string>
     <string name="emoji_money">💰</string>
+
+    <!-- User Menu -->
+    <string name="menu_profile">Profile</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_logout">Logout</string>
 </resources>

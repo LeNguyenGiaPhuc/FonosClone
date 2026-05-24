@@ -10,5 +10,6 @@ public class PodcourseActivity extends BaseActivity {
 
         applySystemBarPadding(R.id.main);
         setupBottomNavigation(NAV_PODCOURSE);
+        setupUserMenu();
     }
 }

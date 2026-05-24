@@ -7,17 +7,15 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient">
 
-    <!-- NỘI DUNG CHÍNH -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="72dp"
         android:orientation="vertical">
 
-        <!-- THANH ĐẦU TRANG -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="68dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:paddingStart="16dp"
@@ -40,13 +38,16 @@
                     app:tint="#F07830" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginStart="10dp"
                     android:text="@string/app_name_lowercase"
                     android:textColor="#FFFFFF"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:singleLine="true"
+                    android:ellipsize="end" />
             </LinearLayout>
 
             <Button
@@ -75,7 +76,6 @@
                 app:tint="#B0B0B0" />
         </LinearLayout>
 
-        <!-- TABS -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,17 +97,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/audiobooks"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#D6DDFE"
                     android:textSize="15sp"
-                    android:textStyle="bold"
                     android:paddingTop="10dp"
-                    android:paddingBottom="8dp"/>
+                    android:paddingBottom="11dp" />
 
                 <View
                     android:id="@+id/indicatorAudiobooks"
                     android:layout_width="match_parent"
                     android:layout_height="3dp"
-                    android:background="#F07830"/>
+                    android:background="#00000000" />
             </LinearLayout>
 
             <LinearLayout
@@ -124,16 +123,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ebooks"
-                    android:textColor="#D6DDFE"
+                    android:textColor="#FFFFFF"
                     android:textSize="15sp"
+                    android:textStyle="bold"
                     android:paddingTop="10dp"
-                    android:paddingBottom="11dp"/>
+                    android:paddingBottom="8dp" />
 
                 <View
                     android:id="@+id/indicatorEbooks"
                     android:layout_width="match_parent"
                     android:layout_height="3dp"
-                    android:background="#00000000"/>
+                    android:background="#F07830" />
             </LinearLayout>
 
             <LinearLayout
@@ -152,17 +152,16 @@
                     android:textColor="#D6DDFE"
                     android:textSize="15sp"
                     android:paddingTop="10dp"
-                    android:paddingBottom="11dp"/>
+                    android:paddingBottom="11dp" />
 
                 <View
                     android:id="@+id/indicatorSummaries"
                     android:layout_width="match_parent"
                     android:layout_height="3dp"
-                    android:background="#00000000"/>
+                    android:background="#00000000" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- NỘI DUNG CUỘN -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -179,7 +178,6 @@
                 android:paddingTop="14dp"
                 android:paddingBottom="20dp">
 
-                <!-- THẺ NỘI DUNG TRẮNG -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -188,7 +186,6 @@
                     android:paddingTop="18dp"
                     android:paddingBottom="18dp">
 
-                    <!-- NỔI BẬT -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -200,19 +197,19 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/recommended_for_you"
+                            android:text="@string/recommended_ebooks"
                             android:textColor="#1A2B5F"
                             android:textSize="18sp"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:layout_marginBottom="14dp"
-                            android:text="@string/recommended_subtitle"
+                            android:text="@string/recommended_ebooks_subtitle"
                             android:textColor="#7D88A6"
-                            android:textSize="13sp"/>
+                            android:textSize="13sp" />
 
                         <HorizontalScrollView
                             android:layout_width="match_parent"
@@ -245,7 +242,7 @@
                                             android:text="@string/book_thu_cho_em"
                                             android:textColor="#5A3812"
                                             android:textSize="14sp"
-                                            android:textStyle="bold"/>
+                                            android:textStyle="bold" />
                                     </LinearLayout>
                                 </com.google.android.material.card.MaterialCardView>
 
@@ -270,7 +267,7 @@
                                             android:text="@string/book_think_and_grow_rich"
                                             android:textColor="#FFD84D"
                                             android:textSize="14sp"
-                                            android:textStyle="bold"/>
+                                            android:textStyle="bold" />
                                     </LinearLayout>
                                 </com.google.android.material.card.MaterialCardView>
 
@@ -294,14 +291,13 @@
                                             android:text="@string/book_khong_gia_dinh"
                                             android:textColor="#FFFFFF"
                                             android:textSize="14sp"
-                                            android:textStyle="bold"/>
+                                            android:textStyle="bold" />
                                     </LinearLayout>
                                 </com.google.android.material.card.MaterialCardView>
                             </LinearLayout>
                         </HorizontalScrollView>
                     </LinearLayout>
 
-                    <!-- PHẦN LƯỚI -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -309,7 +305,6 @@
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp">
 
-                        <!-- hàng 1 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -344,7 +339,7 @@
                                             android:text="@string/book_thu_cho_em"
                                             android:textColor="#5A3812"
                                             android:textSize="14sp"
-                                            android:textStyle="bold"/>
+                                            android:textStyle="bold" />
                                     </LinearLayout>
                                 </com.google.android.material.card.MaterialCardView>
 
@@ -355,14 +350,14 @@
                                     android:text="@string/book_thu_cho_em_title"
                                     android:textColor="#1A2B5F"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"/>
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="@string/author_hoang_nam_tien"
                                     android:textColor="#8892AE"
-                                    android:textSize="11sp"/>
+                                    android:textSize="11sp" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -392,7 +387,7 @@
                                             android:text="@string/book_think_and_grow_rich"
                                             android:textColor="#FFD84D"
                                             android:textSize="14sp"
-                                            android:textStyle="bold"/>
+                                            android:textStyle="bold" />
                                     </LinearLayout>
                                 </com.google.android.material.card.MaterialCardView>
 
@@ -403,14 +398,14 @@
                                     android:text="@string/book_think_and_grow_rich_title"
                                     android:textColor="#1A2B5F"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"/>
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="@string/author_napoleon_hill"
                                     android:textColor="#8892AE"
-                                    android:textSize="11sp"/>
+                                    android:textSize="11sp" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -439,7 +434,7 @@
                                             android:text="@string/book_khong_gia_dinh"
                                             android:textColor="#FFFFFF"
                                             android:textSize="14sp"
-                                            android:textStyle="bold"/>
+                                            android:textStyle="bold" />
                                     </LinearLayout>
                                 </com.google.android.material.card.MaterialCardView>
 
@@ -450,18 +445,17 @@
                                     android:text="@string/book_khong_gia_dinh_title"
                                     android:textColor="#1A2B5F"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"/>
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="@string/author_hector_malot"
                                     android:textColor="#8892AE"
-                                    android:textSize="11sp"/>
+                                    android:textSize="11sp" />
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- hàng 2 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -496,7 +490,7 @@
                                             android:text="@string/book_nghe_thuat_tinh_te"
                                             android:textColor="#FFFFFF"
                                             android:textSize="13sp"
-                                            android:textStyle="bold"/>
+                                            android:textStyle="bold" />
                                     </LinearLayout>
                                 </com.google.android.material.card.MaterialCardView>
 
@@ -507,14 +501,14 @@
                                     android:text="@string/book_nghe_thuat_tinh_te_title"
                                     android:textColor="#1A2B5F"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"/>
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="@string/author_mark_manson"
                                     android:textColor="#8892AE"
-                                    android:textSize="11sp"/>
+                                    android:textSize="11sp" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -533,7 +527,7 @@
                                     <LinearLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
-                                        android:background="#F0EAD6"
+                                        android:background="#E8D7B5"
                                         android:gravity="center"
                                         android:padding="10dp">
 
@@ -544,7 +538,7 @@
                                             android:text="@string/book_end_procrastination"
                                             android:textColor="#8B5A25"
                                             android:textSize="13sp"
-                                            android:textStyle="bold"/>
+                                            android:textStyle="bold" />
                                     </LinearLayout>
                                 </com.google.android.material.card.MaterialCardView>
 
@@ -555,14 +549,14 @@
                                     android:text="@string/book_end_procrastination_title"
                                     android:textColor="#1A2B5F"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"/>
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="@string/author_darius_foroux"
                                     android:textColor="#8892AE"
-                                    android:textSize="11sp"/>
+                                    android:textSize="11sp" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -591,7 +585,7 @@
                                             android:text="@string/book_dac_nhan_tam"
                                             android:textColor="#FFFFFF"
                                             android:textSize="14sp"
-                                            android:textStyle="bold"/>
+                                            android:textStyle="bold" />
                                     </LinearLayout>
                                 </com.google.android.material.card.MaterialCardView>
 
@@ -602,14 +596,14 @@
                                     android:text="@string/book_dac_nhan_tam_title"
                                     android:textColor="#1A2B5F"
                                     android:textSize="12sp"
-                                    android:textStyle="bold"/>
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="@string/author_dale_carnegie"
                                     android:textColor="#8892AE"
-                                    android:textSize="11sp"/>
+                                    android:textSize="11sp" />
                             </LinearLayout>
                         </LinearLayout>
 
@@ -623,159 +617,17 @@
                             android:textAllCaps="false"
                             android:textColor="#FFFFFF"
                             android:textSize="15sp"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>
 
-    <!-- THANH ĐIỀU HƯỚNG DƯỚI -->
-    <com.google.android.material.card.MaterialCardView
+    <include
+        android:id="@+id/bottomNav"
+        layout="@layout/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_gravity="bottom"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="10dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#FFFFFF"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:id="@+id/navSach"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:clickable="true"
-                android:focusable="true">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_agenda"
-                    android:contentDescription="@string/nav_books"
-                    app:tint="#6A53B0"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="@string/nav_books"
-                    android:textColor="#6A53B0"
-                    android:textSize="11sp"
-                    android:textStyle="bold"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/navPodCourse"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:clickable="true"
-                android:focusable="true">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_media_play"
-                    android:contentDescription="@string/nav_podcourse"
-                    app:tint="#B0B0B0"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="@string/nav_podcourse"
-                    android:textColor="#B0B0B0"
-                    android:textSize="11sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/navKhamPha"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:clickable="true"
-                android:focusable="true">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_search"
-                    android:contentDescription="@string/nav_explore"
-                    app:tint="#B0B0B0"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="@string/nav_explore"
-                    android:textColor="#B0B0B0"
-                    android:textSize="11sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/navThuThach"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:clickable="true"
-                android:focusable="true">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_share"
-                    android:contentDescription="@string/nav_challenges"
-                    app:tint="#B0B0B0"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="@string/nav_challenges"
-                    android:textColor="#B0B0B0"
-                    android:textSize="11sp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/navThuVien"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:clickable="true"
-                android:focusable="true">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_sort_by_size"
-                    android:contentDescription="@string/nav_library"
-                    app:tint="#B0B0B0"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="@string/nav_library"
-                    android:textColor="#B0B0B0"
-                    android:textSize="11sp"/>
-            </LinearLayout>
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
+        android:layout_gravity="bottom" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -53,6 +53,10 @@
     <!-- Recommended section -->
     <string name="recommended_for_you">12 Sách Nói Dành Cho Bạn</string>
     <string name="recommended_subtitle">Phù hợp với người mới — bấm để nghe ngay</string>
+    <string name="recommended_ebooks">12 Sách Điện Tử Cho Bạn</string>
+    <string name="recommended_ebooks_subtitle">Đọc mọi lúc, mọi nơi — bấm để xem</string>
+    <string name="recommended_summaries">12 Tóm Tắt Sách Cho Bạn</string>
+    <string name="recommended_summaries_subtitle">Kiến thức trọng tâm trong 15 phút — bấm để đọc</string>
     <string name="see_all">Xem tất cả</string>
 
     <!-- Bottom navigation -->
@@ -153,4 +157,9 @@
     <string name="emoji_grad">🎓</string>
     <string name="emoji_chart">📊</string>
     <string name="emoji_money">💰</string>
+
+    <!-- Menu Người dùng -->
+    <string name="menu_profile">Hồ sơ</string>
+    <string name="menu_settings">Cài đặt</string>
+    <string name="menu_logout">Đăng xuất</string>
 </resources>

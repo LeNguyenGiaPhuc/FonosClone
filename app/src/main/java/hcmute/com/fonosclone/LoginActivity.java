@@ -38,6 +38,13 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(this, RegisterActivity.class));
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         });
+
+        // Chuyển trang sau khi nhấn vào bất kỳ đâu trên màn hình (theo yêu cầu)
+        findViewById(R.id.main).setOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
 
     private void validateLogin() {
@@ -56,5 +63,10 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         Toast.makeText(this, "✅ Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+
+        // Chuyển sang trang chủ sau khi đăng nhập thành công
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish(); // Đóng LoginActivity
     }
 }

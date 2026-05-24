@@ -10,5 +10,6 @@ public class LibraryActivity extends BaseActivity {
 
         applySystemBarPadding(R.id.main);
         setupBottomNavigation(NAV_LIBRARY);
+        setupUserMenu();
     }
 }

@@ -16,6 +16,8 @@
         <activity android:name=".SearchActivity" />
         <activity android:name=".ChallengesActivity" />
         <activity android:name=".LibraryActivity" />
+        <activity android:name=".EbookActivity" />
+        <activity android:name=".SummaryActivity" />
 
         <activity
             android:name=".MainActivity"

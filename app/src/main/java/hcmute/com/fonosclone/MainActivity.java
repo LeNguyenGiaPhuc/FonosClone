@@ -10,5 +10,7 @@ public class MainActivity extends BaseActivity {
 
         applySystemBarPadding(R.id.main);
         setupBottomNavigation(NAV_BOOKS);
+        setupTabs(TAB_AUDIOBOOKS);
+        setupUserMenu();
     }
 }

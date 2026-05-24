@@ -10,5 +10,6 @@ public class SearchActivity extends BaseActivity {
 
         applySystemBarPadding(R.id.main);
         setupBottomNavigation(NAV_EXPLORE);
+        setupUserMenu();
     }
 }
