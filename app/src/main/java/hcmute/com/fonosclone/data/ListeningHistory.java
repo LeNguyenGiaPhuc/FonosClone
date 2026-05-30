@@ -9,10 +9,10 @@ public class ListeningHistory {
     public int id;
 
     public int bookId;
-    public int listenedMinutes;
+    public int listenedSeconds;
 
-    public ListeningHistory(int bookId, int listenedMinutes) {
+    public ListeningHistory(int bookId, int listenedSeconds) {
         this.bookId = bookId;
-        this.listenedMinutes = listenedMinutes;
+        this.listenedSeconds = listenedSeconds;
     }
 }

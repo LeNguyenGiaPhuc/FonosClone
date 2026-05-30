@@ -16,6 +16,9 @@ public interface FonosDao {
     @Insert
     void insertListeningHistory(ListeningHistory history);
 
+    @Query("SELECT COALESCE(SUM(listenedSeconds), 0) FROM listening_history")
+    int getTotalListenedSeconds();
+
     @Query("SELECT COUNT(*) FROM books")
     int countBooks();
 
@@ -24,6 +27,9 @@ public interface FonosDao {
 
     @Query("SELECT * FROM books WHERE type = :type")
     List<Book> getBooksByType(String type);
+
+    @Query("SELECT * FROM books WHERE id = :bookId LIMIT 1")
+    Book getBookById(int bookId);
 
     @Query("SELECT * FROM books WHERE isFavorite = 1")
     List<Book> getFavoriteBooks();

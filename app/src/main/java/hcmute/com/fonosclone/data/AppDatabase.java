@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase;
 
 @Database(
         entities = {Book.class, PodCourse.class, ListeningHistory.class},
-        version = 1,
+        version = 3,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -21,7 +21,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     context.getApplicationContext(),
                     AppDatabase.class,
                     "fonos_database"
-            ).build();
+            ).fallbackToDestructiveMigration().build();
         }
         return instance;
     }

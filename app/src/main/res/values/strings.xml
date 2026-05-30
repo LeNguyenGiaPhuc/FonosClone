@@ -63,6 +63,19 @@
     <!-- Featured section -->
     <string name="featured_book_title">THE SUBTLE ART OF\nNOT GIVING\nA F*CK</string>
     <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="stop">Stop</string>
+    <string name="cancel">Cancel</string>
+    <string name="now_playing">Now Playing</string>
+    <string name="audio_channel_name">Audio playback</string>
+    <string name="audio_notification_title">Playing audio</string>
+    <string name="audio_notification_subtitle">67 Audio Book</string>
+    <string name="player_time_zero">00:00 / 00:00</string>
+    <string name="player_time_format">%1$s / %2$s</string>
+    <string name="download_channel_name">Content downloads</string>
+    <string name="download_default_title">Audio content</string>
+    <string name="download_in_progress">Downloading</string>
+    <string name="download_completed">Download complete</string>
     <string name="best_seller">BEST SELLER</string>
 
     <!-- Recommended section -->
@@ -126,8 +139,9 @@
     <string name="diamond_points">Diamond Points</string>
     <string name="points_count">1250</string>
     <string name="daily_mission">Daily Mission</string>
-    <string name="listen_30m">Listen for 30 minutes</string>
-    <string name="mission_progress">15/30 min</string>
+    <string name="listen_30m">Listen for 30 seconds</string>
+    <string name="mission_progress">0/30 sec</string>
+    <string name="mission_progress_format">%1$d/%2$d sec</string>
     <string name="claim_reward">Claim Reward</string>
     <string name="weekly_challenge">Weekly Challenge</string>
     <string name="complete_book">Complete 1 audiobook</string>
@@ -189,4 +203,52 @@
     <string name="profile_session_message">Signed in as %1$s (%2$s)</string>
     <string name="book_cover">Book cover</string>
     <string name="new_books">New books</string>
+
+    <!-- Profile -->
+    <string name="profile_guest_name">Guest</string>
+    <string name="profile_guest_email">guest@fonos.local</string>
+    <string name="profile_handle_format">@%1$s</string>
+    <string name="profile_joined">Joined since May, 2026</string>
+    <string name="profile_change_photo">Change photo</string>
+    <string name="profile_trial">Try the yearly plan for FREE</string>
+    <string name="profile_premium_plan">Premium Plan</string>
+    <string name="profile_premium_price">0d</string>
+    <string name="profile_premium_benefit_1">Includes all Lite benefits.</string>
+    <string name="profile_premium_benefit_2">Get 1 Fonos card every month for premium books.</string>
+    <string name="profile_try_free">Try free (0d)</string>
+    <string name="profile_lite_plan">Lite Plan</string>
+    <string name="profile_lite_price">From 42,000d/month</string>
+    <string name="profile_lite_benefit_1">Listen to member audiobooks for free.</string>
+    <string name="profile_lite_benefit_2">Read ebooks, summaries, meditation and children content.</string>
+    <string name="profile_register_lite">Register Lite</string>
+    <string name="profile_listening_level">Listening level</string>
+    <string name="profile_level_one">Lv.\n1</string>
+    <string name="profile_seconds_listened">Seconds listened</string>
+    <string name="profile_content_bought_zero">0</string>
+    <string name="profile_content_bought">Purchased content</string>
+    <string name="profile_reviews">Reviews</string>
+    <string name="profile_no_reviews">No reviews yet</string>
+    <string name="profile_cup_shelf">Cup shelf</string>
+    <string name="profile_empty_cup">Your shelf is empty.</string>
+    <string name="profile_start_collecting">Start collecting cups</string>
+    <string name="profile_badges">Badges</string>
+    <string name="profile_no_badges">You do not have any badge yet.</string>
+    <string name="profile_view_badges">View all badges</string>
+    <string name="profile_support">Support</string>
+    <string name="profile_contact_support">Contact support</string>
+    <string name="profile_join_community">Join Fonos community</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_icons">Light / Dark</string>
+    <string name="settings_support">Support</string>
+    <string name="settings_personal_info">Personal information</string>
+    <string name="settings_download_data">Data and download settings</string>
+    <string name="settings_scan_qr">Scan QR code</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_about">About us</string>
+    <string name="settings_terms">Terms of use</string>
+    <string name="settings_privacy">Privacy policy</string>
+    <string name="settings_version">Version: 1778236026/715.0</string>
 </resources>

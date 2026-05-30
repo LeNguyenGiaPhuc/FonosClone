@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">67 Audio Book</string>
-    <string name="app_name_lowercase" translatable="false">67 audio book</string>\
+    <string name="app_name_lowercase" translatable="false">67 audio book</string>
 
     <!-- Login -->
     <string name="logo_desc">Logo ứng dụng</string>
@@ -63,6 +63,19 @@
     <!-- Featured section -->
     <string name="featured_book_title">NGHỆ THUẬT\nTINH TẾ CỦA VIỆC\nĐẾCH QUAN TÂM</string>
     <string name="play">Phát</string>
+    <string name="pause">Tạm dừng</string>
+    <string name="stop">Dừng</string>
+    <string name="cancel">Hủy</string>
+    <string name="now_playing">Đang phát</string>
+    <string name="audio_channel_name">Phát âm thanh</string>
+    <string name="audio_notification_title">Đang phát audio</string>
+    <string name="audio_notification_subtitle">67 Audio Book</string>
+    <string name="player_time_zero">00:00 / 00:00</string>
+    <string name="player_time_format">%1$s / %2$s</string>
+    <string name="download_channel_name">Tải nội dung</string>
+    <string name="download_default_title">Nội dung audio</string>
+    <string name="download_in_progress">Đang tải</string>
+    <string name="download_completed">Tải xong</string>
     <string name="best_seller"> BÁN CHẠY NHẤT</string>
 
     <!-- Recommended section -->
@@ -118,8 +131,9 @@
     <string name="diamond_points">Điểm Kim Cương</string>
     <string name="points_count">1250</string>
     <string name="daily_mission">Nhiệm vụ hàng ngày</string>
-    <string name="listen_30m">Nghe trong 30 phút</string>
-    <string name="mission_progress">15/30 phút</string>
+    <string name="listen_30m">Nghe trong 30 giây</string>
+    <string name="mission_progress">0/30 giây</string>
+    <string name="mission_progress_format">%1$d/%2$d giây</string>
     <string name="claim_reward">Nhận thưởng</string>
     <string name="weekly_challenge">Thử thách tuần</string>
     <string name="complete_book">Hoàn thành 1 sách nói</string>
@@ -179,4 +193,51 @@
     <string name="menu_settings">Cài đặt</string>
     <string name="menu_logout">Đăng xuất</string>
     <string name="profile_session_message">Đang đăng nhập: %1$s (%2$s)</string>
+    <!-- Profile -->
+    <string name="profile_guest_name">Khách</string>
+    <string name="profile_guest_email">guest@fonos.local</string>
+    <string name="profile_handle_format">@%1$s</string>
+    <string name="profile_joined">Tham gia từ Tháng 05, 2026</string>
+    <string name="profile_change_photo">Đổi ảnh</string>
+    <string name="profile_trial">Dùng thử gói năm MIỄN PHÍ</string>
+    <string name="profile_premium_plan">Gói Premium</string>
+    <string name="profile_premium_price">0đ</string>
+    <string name="profile_premium_benefit_1">Bao gồm mọi quyền lợi của gói Lite.</string>
+    <string name="profile_premium_benefit_2">Thêm 1 thẻ Fonos mỗi tháng để mua sách Premium.</string>
+    <string name="profile_try_free">Thử miễn phí (0đ)</string>
+    <string name="profile_lite_plan">Gói Lite</string>
+    <string name="profile_lite_price">Chỉ từ 42.000đ/tháng</string>
+    <string name="profile_lite_benefit_1">Nghe miễn phí hàng trăm sách nói hội viên.</string>
+    <string name="profile_lite_benefit_2">Nghe và đọc Ebook, tóm tắt sách, thiền định và thiếu nhi.</string>
+    <string name="profile_register_lite">Đăng ký gói Lite</string>
+    <string name="profile_listening_level">Cấp độ nghe</string>
+    <string name="profile_level_one">Lv.\n1</string>
+    <string name="profile_seconds_listened">Giây đã nghe</string>
+    <string name="profile_content_bought_zero">0</string>
+    <string name="profile_content_bought">Nội dung đã mua</string>
+    <string name="profile_reviews">Đánh giá</string>
+    <string name="profile_no_reviews">Chưa có đánh giá nào</string>
+    <string name="profile_cup_shelf">Tủ đựng Cúp</string>
+    <string name="profile_empty_cup">Tủ của bạn đang trống.</string>
+    <string name="profile_start_collecting">Bắt đầu săn Cúp</string>
+    <string name="profile_badges">Huy hiệu</string>
+    <string name="profile_no_badges">Bạn chưa có huy hiệu nào.</string>
+    <string name="profile_view_badges">Xem tất cả huy hiệu</string>
+    <string name="profile_support">Hỗ trợ</string>
+    <string name="profile_contact_support">Liên hệ hỗ trợ</string>
+    <string name="profile_join_community">Tham gia Cộng đồng Fonos</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Cài đặt</string>
+    <string name="settings_theme">Giao diện</string>
+    <string name="settings_theme_icons">Sáng / Tối</string>
+    <string name="settings_support">Liên hệ hỗ trợ</string>
+    <string name="settings_personal_info">Thông tin cá nhân</string>
+    <string name="settings_download_data">Cài đặt dữ liệu và tải xuống</string>
+    <string name="settings_scan_qr">Quét mã QR</string>
+    <string name="settings_language">Ngôn ngữ</string>
+    <string name="settings_about">Về chúng tôi</string>
+    <string name="settings_terms">Điều khoản sử dụng</string>
+    <string name="settings_privacy">Chính sách bảo mật</string>
+    <string name="settings_version">Phiên bản: 1778236026/715.0</string>
 </resources>

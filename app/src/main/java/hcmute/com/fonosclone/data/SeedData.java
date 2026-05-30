@@ -26,6 +26,6 @@ public class SeedData {
         dao.insertPodCourse(new PodCourse("AI for Beginners", "Nam Nguyen", "Technology", "#1E8080", 4.8));
         dao.insertPodCourse(new PodCourse("Management for First-Time Leaders", "Vu Duc Tri", "Management", "#7A5540", 4.7));
 
-        dao.insertListeningHistory(new ListeningHistory(1, 25));
+        dao.insertListeningHistory(new ListeningHistory(1, 0));
     }
 }

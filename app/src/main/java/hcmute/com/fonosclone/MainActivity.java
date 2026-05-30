@@ -1,9 +1,11 @@
 package hcmute.com.fonosclone;
 
 import android.os.Bundle;
+import android.content.Intent;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import hcmute.com.fonosclone.data.AppDatabase;
@@ -12,6 +14,7 @@ import hcmute.com.fonosclone.data.FonosDao;
 import hcmute.com.fonosclone.data.SeedData;
 
 public class MainActivity extends BaseActivity {
+    private final List<Book> currentAudiobooks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,9 @@ public class MainActivity extends BaseActivity {
             List<Book> audiobooks = dao.getBooksByType("AUDIOBOOK");
 
             runOnUiThread(() -> {
+                currentAudiobooks.clear();
+                currentAudiobooks.addAll(audiobooks);
+
                 if (audiobooks.size() > 0) {
                     bindCover(audiobooks.get(0), R.id.ivCover1);
                     bindBook(audiobooks.get(0), R.id.ivGridCover1, R.id.tvTitle1, R.id.tvAuthor1);
@@ -47,8 +53,32 @@ public class MainActivity extends BaseActivity {
                     bindCover(audiobooks.get(2), R.id.ivCover3);
                     bindBook(audiobooks.get(2), R.id.ivGridCover3, R.id.tvTitle3, R.id.tvAuthor3);
                 }
+
+                setupBookClick(R.id.ivCover1, 0);
+                setupBookClick(R.id.ivGridCover1, 0);
+                setupBookClick(R.id.ivCover2, 1);
+                setupBookClick(R.id.ivGridCover2, 1);
+                setupBookClick(R.id.ivCover3, 2);
+                setupBookClick(R.id.ivGridCover3, 2);
             });
         }).start();
+    }
+
+    private void setupBookClick(int viewId, int bookIndex) {
+        findViewById(viewId).setOnClickListener(v -> {
+            if (currentAudiobooks.size() <= bookIndex) return;
+            openPlayer(currentAudiobooks.get(bookIndex));
+        });
+    }
+
+    private void openPlayer(Book book) {
+        Intent intent = new Intent(this, PlayerActivity.class);
+        intent.putExtra(AudioPlayerService.EXTRA_TITLE, book.title);
+        intent.putExtra(AudioPlayerService.EXTRA_AUTHOR, book.author);
+        intent.putExtra(AudioPlayerService.EXTRA_AUDIO_RES, book.audioResName);
+        intent.putExtra(PlayerActivity.EXTRA_BOOK_ID, book.id);
+        intent.putExtra("cover_image", book.coverImage);
+        startActivity(intent);
     }
 
     private void bindBook(Book book, int coverViewId, int titleViewId, int authorViewId) {

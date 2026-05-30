@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -87,12 +86,7 @@ public class BaseActivity extends AppCompatActivity {
                     startActivity(new Intent(this, RegisterActivity.class));
                     return true;
                 } else if (id == R.id.menu_profile) {
-                    String profile = getString(
-                            R.string.profile_session_message,
-                            sessionManager.getUserName(),
-                            sessionManager.getUserEmail()
-                    );
-                    Toast.makeText(this, profile, Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, ProfileActivity.class));
                     return true;
                 } else if (id == R.id.menu_logout) {
                     sessionManager.logout();
