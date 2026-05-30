@@ -187,4 +187,6 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_logout">Logout</string>
     <string name="profile_session_message">Signed in as %1$s (%2$s)</string>
+    <string name="book_cover">Book cover</string>
+    <string name="new_books">New books</string>
 </resources>
