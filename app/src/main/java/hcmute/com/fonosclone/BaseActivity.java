@@ -65,33 +65,46 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void setupUserMenu() {
         View ivAvatar = findViewById(R.id.ivAvatar);
-        if (ivAvatar != null) {
-            ivAvatar.setOnClickListener(v -> {
-                PopupMenu popup = new PopupMenu(this, v);
-                popup.getMenuInflater().inflate(R.menu.user_menu, popup.getMenu());
+        if (ivAvatar == null) return;
 
-                popup.setOnMenuItemClickListener(item -> {
-                    int id = item.getItemId();
-                    if (id == R.id.menu_login) {
-                        startActivity(new Intent(this, LoginActivity.class));
-                        return true;
-                    } else if (id == R.id.menu_register) {
-                        startActivity(new Intent(this, RegisterActivity.class));
-                        return true;
-                    } else if (id == R.id.menu_profile) {
-                        Toast.makeText(this, "Tính năng Hồ sơ đang phát triển", Toast.LENGTH_SHORT).show();
-                        return true;
-                    } else if (id == R.id.menu_logout) {
-                        Intent intent = new Intent(this, LoginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        return true;
-                    }
-                    return false;
-                });
-                popup.show();
+        ivAvatar.setOnClickListener(v -> {
+            SessionManager sessionManager = new SessionManager(this);
+            boolean isLoggedIn = sessionManager.isLoggedIn();
+            PopupMenu popup = new PopupMenu(this, v);
+            popup.getMenuInflater().inflate(R.menu.user_menu, popup.getMenu());
+
+            popup.getMenu().findItem(R.id.menu_login).setVisible(!isLoggedIn);
+            popup.getMenu().findItem(R.id.menu_register).setVisible(!isLoggedIn);
+            popup.getMenu().findItem(R.id.menu_profile).setVisible(isLoggedIn);
+            popup.getMenu().findItem(R.id.menu_logout).setVisible(isLoggedIn);
+
+            popup.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.menu_login) {
+                    startActivity(new Intent(this, LoginActivity.class));
+                    return true;
+                } else if (id == R.id.menu_register) {
+                    startActivity(new Intent(this, RegisterActivity.class));
+                    return true;
+                } else if (id == R.id.menu_profile) {
+                    String profile = getString(
+                            R.string.profile_session_message,
+                            sessionManager.getUserName(),
+                            sessionManager.getUserEmail()
+                    );
+                    Toast.makeText(this, profile, Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (id == R.id.menu_logout) {
+                    sessionManager.logout();
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    return true;
+                }
+                return false;
             });
-        }
+            popup.show();
+        });
     }
 
     private void updateTabUI(int tvId, int indicatorId, boolean selected) {
@@ -127,11 +140,11 @@ public class BaseActivity extends AppCompatActivity {
         setNavSelected(navThuThach, selectedItem == NAV_CHALLENGES);
         setNavSelected(navThuVien, selectedItem == NAV_LIBRARY);
 
-        navSach.setOnClickListener(v -> openTab(selectedItem, NAV_BOOKS, MainActivity.class));
-        navPodCourse.setOnClickListener(v -> openTab(selectedItem, NAV_PODCOURSE, PodcourseActivity.class));
-        navKhamPha.setOnClickListener(v -> openTab(selectedItem, NAV_EXPLORE, SearchActivity.class));
-        navThuThach.setOnClickListener(v -> openTab(selectedItem, NAV_CHALLENGES, ChallengesActivity.class));
-        navThuVien.setOnClickListener(v -> openTab(selectedItem, NAV_LIBRARY, LibraryActivity.class));
+        if (navSach != null) navSach.setOnClickListener(v -> openTab(selectedItem, NAV_BOOKS, MainActivity.class));
+        if (navPodCourse != null) navPodCourse.setOnClickListener(v -> openTab(selectedItem, NAV_PODCOURSE, PodcourseActivity.class));
+        if (navKhamPha != null) navKhamPha.setOnClickListener(v -> openTab(selectedItem, NAV_EXPLORE, SearchActivity.class));
+        if (navThuThach != null) navThuThach.setOnClickListener(v -> openTab(selectedItem, NAV_CHALLENGES, ChallengesActivity.class));
+        if (navThuVien != null) navThuVien.setOnClickListener(v -> openTab(selectedItem, NAV_LIBRARY, LibraryActivity.class));
     }
 
     private void openTab(int currentItem, int targetItem, Class<?> targetActivity) {
@@ -144,6 +157,8 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void setNavSelected(View view, boolean selected) {
+        if (view == null) return;
+
         int color = selected ? ACTIVE_COLOR : INACTIVE_COLOR;
 
         if (view instanceof ImageView) {

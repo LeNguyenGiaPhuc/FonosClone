@@ -16,6 +16,10 @@
     <string name="continue_with_google">Tiếp tục với Google</string>
     <string name="no_account">Chưa có tài khoản? </string>
     <string name="register_link">Đăng ký</string>
+    <string name="forgot_password_message">Vui lòng kiểm tra email để đặt lại mật khẩu.</string>
+    <string name="login_success">Đăng nhập thành công.</string>
+    <string name="google_user_name">Người dùng Google</string>
+    <string name="google_user_email">google@fonos.local</string>
 
     <!-- Register -->
     <string name="back">Quay lại</string>
@@ -35,6 +39,17 @@
     <string name="register_button">Đăng ký</string>
     <string name="already_have_account">Bạn đã có tài khoản? </string>
     <string name="login_link">Đăng nhập</string>
+    <string name="terms_message">Điều khoản dịch vụ</string>
+    <string name="register_success">Đăng ký thành công. Chào %1$s.</string>
+
+    <!-- Kiểm tra đăng nhập/đăng ký -->
+    <string name="error_empty_name">Vui lòng nhập họ tên</string>
+    <string name="error_invalid_email">Email không hợp lệ</string>
+    <string name="error_password_min">Mật khẩu tối thiểu 6 ký tự</string>
+    <string name="error_password_mismatch">Mật khẩu không khớp</string>
+    <string name="error_terms_required">Vui lòng đồng ý điều khoản</string>
+    <string name="error_no_registered_account">Chưa có tài khoản nào được đăng ký trên thiết bị này.</string>
+    <string name="error_wrong_credentials">Email hoặc mật khẩu không đúng.</string>
 
     <!-- Home top bar -->
     <string name="upgrade">Nâng cấp</string>
@@ -119,6 +134,7 @@
     <string name="browse_store">Khám phá cửa hàng</string>
 
     <!-- PodCourse -->
+    <string name="podcourse_subtitle">Khóa học âm thanh ngắn</string>
     <string name="did_you_know">Bạn có biết?</string>
     <string name="podcourse_banner_line1">Sau khi mua nội dung trên 67 Audio Book, bạn được</string>
     <string name="podcourse_banner_line2_highlight">sở hữu vĩnh viễn</string>
@@ -162,4 +178,5 @@
     <string name="menu_profile">Hồ sơ</string>
     <string name="menu_settings">Cài đặt</string>
     <string name="menu_logout">Đăng xuất</string>
+    <string name="profile_session_message">Đang đăng nhập: %1$s (%2$s)</string>
 </resources>

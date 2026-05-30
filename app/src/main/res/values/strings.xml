@@ -16,6 +16,10 @@
     <string name="continue_with_google">Continue with Google</string>
     <string name="no_account">No account yet? </string>
     <string name="register_link">Register</string>
+    <string name="forgot_password_message">Please check your email to reset your password.</string>
+    <string name="login_success">Logged in successfully.</string>
+    <string name="google_user_name">Google User</string>
+    <string name="google_user_email">google@fonos.local</string>
 
     <!-- Register -->
     <string name="back">Back</string>
@@ -35,6 +39,17 @@
     <string name="register_button">Register</string>
     <string name="already_have_account">Already have an account? </string>
     <string name="login_link">Log in</string>
+    <string name="terms_message">Terms of Service</string>
+    <string name="register_success">Registration successful. Welcome %1$s.</string>
+
+    <!-- Auth validation -->
+    <string name="error_empty_name">Please enter your full name</string>
+    <string name="error_invalid_email">Invalid email</string>
+    <string name="error_password_min">Password must be at least 6 characters</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="error_terms_required">Please agree to the terms</string>
+    <string name="error_no_registered_account">No account has been registered on this device.</string>
+    <string name="error_wrong_credentials">Email or password is incorrect.</string>
 
     <!-- Home top bar -->
     <string name="upgrade">Upgrade</string>
@@ -127,6 +142,7 @@
     <string name="browse_store">Browse Store</string>
 
     <!-- PodCourse -->
+    <string name="podcourse_subtitle">Short audio courses</string>
     <string name="did_you_know">Did you know?</string>
     <string name="podcourse_banner_line1">After purchasing content on 67 Audio Book, you get</string>
     <string name="podcourse_banner_line2_highlight">lifetime access</string>
@@ -170,4 +186,5 @@
     <string name="menu_profile">Profile</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_logout">Logout</string>
+    <string name="profile_session_message">Signed in as %1$s (%2$s)</string>
 </resources>
