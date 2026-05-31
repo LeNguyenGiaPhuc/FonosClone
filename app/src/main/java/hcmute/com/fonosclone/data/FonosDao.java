@@ -28,6 +28,12 @@ public interface FonosDao {
     @Query("SELECT * FROM books WHERE type = :type")
     List<Book> getBooksByType(String type);
 
+    @Query("SELECT * FROM books")
+    List<Book> getAllBooks();
+
+    @Query("SELECT * FROM books WHERE title LIKE '%' || :keyword || '%' OR author LIKE '%' || :keyword || '%'")
+    List<Book> searchBooks(String keyword);
+
     @Query("SELECT * FROM books WHERE id = :bookId LIMIT 1")
     Book getBookById(int bookId);
 

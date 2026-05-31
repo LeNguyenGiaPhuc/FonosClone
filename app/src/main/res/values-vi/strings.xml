@@ -110,6 +110,26 @@
     <string name="book_end_procrastination_title">Thoát Khỏi Trì Hoãn</string>
     <string name="book_dac_nhan_tam_title">Đắc Nhân Tâm</string>
 
+    <!-- Additional Books -->
+    <string name="book_mui_huong">Mùi Hương</string>
+    <string name="book_yen_huyet">Yên Huyết</string>
+    <string name="book_la_bai_chu">Lá Bài Chú</string>
+    <string name="book_phi_vu_cuoi">Phi Vụ Cuối</string>
+    <string name="book_pippi">Pippi Tất Dài</string>
+    <string name="book_nhung_nguoi_khon_kho">Những Người Khốn Khổ</string>
+    <string name="book_chu_be_mo_khoa">Chú Bé Có Tài Mở Khóa</string>
+    <string name="book_kheo_an_noi">Khéo Ăn Nói Được Thiên Hạ</string>
+    <string name="book_phat_trien_lanh_dao">Phát Triển Kỹ Năng Lãnh Đạo</string>
+    <string name="book_phi_ly_hop_ly">Phi Lý Một Cách Hợp Lý</string>
+    <string name="book_mac_ke_no">Mặc Kệ Nó Làm Tới Đi</string>
+    <string name="book_luyen_tri_nho">Luyện Trí Nhớ</string>
+    <string name="book_ben_kia_buc_tuong">Bên Kia Bức Tường</string>
+    <string name="book_bong_hong_nhung">Bông Hồng Nhung</string>
+    <string name="book_hau_hong_lau_mong">Hậu Hồng Lâu Mộng</string>
+    <string name="book_lan_au_lam_sep">Lần Đầu Làm Sếp</string>
+    <string name="book_quang_tri_1972">Quảng Trị 1972</string>
+    <string name="book_suc_manh_thuyet_phuc">Sức Mạnh Thuyết Phục</string>
+
     <string name="explore_title">Khám phá</string>
     <string name="search_icon_desc">Biểu tượng tìm kiếm</string>
     <string name="search_hint">Tìm tên sách, tác giả, mentor...</string>
