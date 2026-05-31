@@ -10,6 +10,7 @@ constraintlayout = "2.2.1"
 room = "2.8.4"
 googleServices = "4.4.1"
 firebaseBom = "32.8.0"
+playServicesAuth = "21.2.0"
 
 
 [libraries]
@@ -26,6 +27,7 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

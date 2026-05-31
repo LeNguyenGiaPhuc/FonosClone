@@ -20,6 +20,8 @@
     <string name="login_success">Đăng nhập thành công.</string>
     <string name="google_user_name">Người dùng Google</string>
     <string name="google_user_email">google@fonos.local</string>
+    <string name="google_sign_in_missing_config">Chưa cấu hình Google Sign-In. Hãy đặt google_web_client_id.</string>
+    <string name="google_sign_in_failed">Đăng nhập Google thất bại.</string>
 
     <!-- Register -->
     <string name="back">Quay lại</string>

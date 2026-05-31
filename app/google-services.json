@@ -12,7 +12,20 @@
           "package_name": "hcmute.com.fonosclone"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "19500543058-h449qbpl2rg3ti5l7o4innup7hj583ug.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hcmute.com.fonosclone",
+            "certificate_hash": "1f1709209b6bf246751db7514608573db1f8f2c3"
+          }
+        },
+        {
+          "client_id": "19500543058-ulgichcim3kuh942d8lpbvbtavufeoa9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDChS7_UVJ4r2LFFaW81bhN05q3GybBW24"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "19500543058-ulgichcim3kuh942d8lpbvbtavufeoa9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -11,16 +11,32 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private static final int RC_GOOGLE_SIGN_IN = 1001;
+    private static final String GOOGLE_WEB_CLIENT_PLACEHOLDER = "REPLACE_WITH_FIREBASE_WEB_CLIENT_ID";
 
     EditText etEmail, etPassword;
     Button btnLogin, btnGoogle;
     TextView tvForgot, tvGoRegister;
     SessionManager sessionManager;
+    GoogleSignInClient googleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +56,11 @@ public class LoginActivity extends AppCompatActivity {
         tvForgot = findViewById(R.id.tvForgot);
         tvGoRegister = findViewById(R.id.tvGoRegister);
 
+        setupGoogleSignIn();
+
         btnLogin.setOnClickListener(v -> validateLogin());
 
-        btnGoogle.setOnClickListener(v -> {
-            sessionManager.login(getString(R.string.google_user_name), getString(R.string.google_user_email));
-            Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
-            openHome();
-        });
+        btnGoogle.setOnClickListener(v -> startGoogleSignIn());
 
         tvForgot.setOnClickListener(v ->
                 Toast.makeText(this, R.string.forgot_password_message, Toast.LENGTH_SHORT).show()
@@ -56,6 +70,116 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(this, RegisterActivity.class));
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
         });
+    }
+
+    private void setupGoogleSignIn() {
+        String webClientId = getString(R.string.google_web_client_id);
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(webClientId)
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
+    }
+
+    private void startGoogleSignIn() {
+        String webClientId = getString(R.string.google_web_client_id);
+        if (webClientId.equals(GOOGLE_WEB_CLIENT_PLACEHOLDER)) {
+            Toast.makeText(this, R.string.google_sign_in_missing_config, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        googleSignInClient.signOut().addOnCompleteListener(task -> {
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN);
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode != RC_GOOGLE_SIGN_IN) return;
+
+        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+        try {
+            GoogleSignInAccount account = task.getResult(ApiException.class);
+            if (account == null || account.getIdToken() == null) {
+                Toast.makeText(this, R.string.google_sign_in_failed, Toast.LENGTH_LONG).show();
+                return;
+            }
+            firebaseAuthWithGoogle(account.getIdToken());
+        } catch (ApiException e) {
+            Toast.makeText(this, getString(R.string.google_sign_in_failed) + " " + e.getStatusCode(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void firebaseAuthWithGoogle(String idToken) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Đang đăng nhập Google...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        FirebaseAuth.getInstance().signInWithCredential(credential)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user == null) {
+                            progressDialog.dismiss();
+                            Toast.makeText(this, R.string.google_sign_in_failed, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        saveGoogleUserSession(user, progressDialog);
+                    } else {
+                        progressDialog.dismiss();
+                        String error = task.getException() != null
+                                ? task.getException().getLocalizedMessage()
+                                : getString(R.string.google_sign_in_failed);
+                        Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void saveGoogleUserSession(FirebaseUser user, ProgressDialog progressDialog) {
+        String name = user.getDisplayName();
+        String email = user.getEmail();
+
+        if (name == null || name.trim().isEmpty()) {
+            name = getString(R.string.google_user_name);
+        }
+        if (email == null || email.trim().isEmpty()) {
+            email = getString(R.string.google_user_email);
+        }
+
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("uid", user.getUid());
+        userData.put("name", name);
+        userData.put("email", email);
+        userData.put("provider", "google");
+        userData.put("updatedAt", System.currentTimeMillis());
+        if (user.getPhotoUrl() != null) {
+            userData.put("avatarUrl", user.getPhotoUrl().toString());
+        }
+
+        String finalName = name;
+        String finalEmail = email;
+        FirebaseFirestore.getInstance().collection("users")
+                .document(user.getUid())
+                .set(userData, SetOptions.merge())
+                .addOnCompleteListener(task -> {
+                    progressDialog.dismiss();
+                    if (!task.isSuccessful()) {
+                        String error = task.getException() != null
+                                ? task.getException().getLocalizedMessage()
+                                : getString(R.string.google_sign_in_failed);
+                        Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    sessionManager.login(finalName, finalEmail);
+                    Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
+                    openHome();
+                });
     }
 
     private void validateLogin() {

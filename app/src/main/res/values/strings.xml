@@ -20,6 +20,8 @@
     <string name="login_success">Logged in successfully.</string>
     <string name="google_user_name">Google User</string>
     <string name="google_user_email">google@fonos.local</string>
+    <string name="google_sign_in_missing_config">Google Sign-In is not configured. Please set google_web_client_id.</string>
+    <string name="google_sign_in_failed">Google Sign-In failed.</string>
 
     <!-- Register -->
     <string name="back">Back</string>
