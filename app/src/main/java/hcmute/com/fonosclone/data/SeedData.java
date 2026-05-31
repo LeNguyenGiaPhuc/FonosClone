@@ -56,6 +56,10 @@ public class SeedData {
 
         dao.insertPodCourse(new PodCourse("AI for Beginners", "Nam Nguyen", "Technology", "#1E8080", 4.8));
         dao.insertPodCourse(new PodCourse("Management for First-Time Leaders", "Vu Duc Tri", "Management", "#7A5540", 4.7));
+        dao.insertPodCourse(new PodCourse("Personal Finance Thinking", "Tran Viet Quan", "Finance", "#1A3A5C", 4.7));
+        dao.insertPodCourse(new PodCourse("Kỹ năng Thuyết trình Chuyên nghiệp", "Nhiều tác giả", "Soft Skills", "#5A3E91", 4.6));
+        dao.insertPodCourse(new PodCourse("Startup 101: Từ Ý tưởng đến Gọi vốn", "Lâm Minh Chánh", "Business", "#A63B3B", 4.9));
+        dao.insertPodCourse(new PodCourse("Product Management Đột phá", "Hoàng Nam Tiến", "Product", "#2E6930", 4.8));
 
         dao.insertListeningHistory(new ListeningHistory(1, 0));
     }

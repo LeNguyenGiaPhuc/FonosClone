@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -232,6 +232,7 @@
                 android:layout_marginBottom="20dp">
 
                 <LinearLayout
+                    android:id="@+id/horizontalCoursesContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -647,6 +648,7 @@
 
             <!-- FEATURED COURSE LIST -->
             <LinearLayout
+                android:id="@+id/featuredCoursesContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"

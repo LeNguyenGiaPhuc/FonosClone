@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.graphics.Color;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -58,10 +60,14 @@ public class PlayerActivity extends BaseActivity {
         audioResName = getIntent().getStringExtra(AudioPlayerService.EXTRA_AUDIO_RES);
         bookId = getIntent().getIntExtra(EXTRA_BOOK_ID, 0);
         String coverImage = getIntent().getStringExtra("cover_image");
+        String coverColor = getIntent().getStringExtra("cover_color");
+        String coverEmoji = getIntent().getStringExtra("cover_emoji");
 
         TextView titleView = findViewById(R.id.tvPlayerTitle);
         TextView authorView = findViewById(R.id.tvPlayerAuthor);
         ImageView coverView = findViewById(R.id.ivPlayerCover);
+        com.google.android.material.card.MaterialCardView coverCard = findViewById(R.id.cvPlayerCoverCard);
+        TextView emojiView = findViewById(R.id.tvPlayerEmoji);
         playPauseButton = findViewById(R.id.btnPlayPause);
         Button stopButton = findViewById(R.id.btnStop);
         progressBar = findViewById(R.id.sbPlayerProgress);
@@ -73,9 +79,27 @@ public class PlayerActivity extends BaseActivity {
         titleView.setText(title);
         authorView.setText(author);
 
-        int coverResId = getResources().getIdentifier(coverImage, "drawable", getPackageName());
-        if (coverResId != 0) {
-            coverView.setImageResource(coverResId);
+        if (coverColor != null && !coverColor.isEmpty()) {
+            // It's a PodCourse/Podcast: Show color and emoji
+            coverView.setVisibility(View.GONE);
+            emojiView.setVisibility(View.VISIBLE);
+            emojiView.setText(coverEmoji != null ? coverEmoji : "🎓");
+            coverCard.setCardBackgroundColor(Color.parseColor(coverColor));
+        } else {
+            // It's a standard Book: Show image cover and reset background to white
+            coverView.setVisibility(View.VISIBLE);
+            emojiView.setVisibility(View.GONE);
+            coverCard.setCardBackgroundColor(Color.WHITE);
+            if (coverImage != null && !coverImage.isEmpty()) {
+                int coverResId = getResources().getIdentifier(coverImage, "drawable", getPackageName());
+                if (coverResId != 0) {
+                    coverView.setImageResource(coverResId);
+                } else {
+                    coverView.setImageResource(android.R.drawable.ic_menu_gallery);
+                }
+            } else {
+                coverView.setImageResource(android.R.drawable.ic_menu_gallery);
+            }
         }
 
         playPauseButton.setOnClickListener(v -> {
