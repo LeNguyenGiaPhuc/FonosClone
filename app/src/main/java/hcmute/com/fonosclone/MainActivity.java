@@ -1,16 +1,24 @@
 package hcmute.com.fonosclone;
 
-import android.os.Bundle;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import hcmute.com.fonosclone.data.AppDatabase;
 import hcmute.com.fonosclone.data.Book;
 import hcmute.com.fonosclone.data.FonosDao;
+import hcmute.com.fonosclone.data.PodCourse;
 import hcmute.com.fonosclone.data.SeedData;
 
 public class MainActivity extends BaseActivity {
@@ -27,11 +35,36 @@ public class MainActivity extends BaseActivity {
         setupUserMenu();
 
         AppDatabase db = AppDatabase.getInstance(this);
+        FonosRepository repository = new FonosRepository(this);
 
+        // 1. Tự động kiểm tra và đồng bộ ngược dữ liệu lên Firestore có chẩn đoán lỗi bằng Toast
+        seedFirestoreIfNecessary();
+
+        // 2. Đọc nhanh từ Room cục bộ ngay lập tức để UI mượt mà (0ms lag)
+        loadLocalBooks(db);
+
+        // 3. Chạy ngầm đồng bộ từ Cloud Firestore về máy
+        repository.syncBooks(new FonosRepository.SyncCallback() {
+            @Override
+            public void onSuccess() {
+                // Đồng bộ xong -> Nạp lại giao diện với sách mới nhất từ mây
+                loadLocalBooks(db);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Thất bại (như mất mạng) -> Giữ nguyên dữ liệu cục bộ, không gây crash ứng dụng
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void loadLocalBooks(AppDatabase db) {
         new Thread(() -> {
             FonosDao dao = db.fonosDao();
-
-            SeedData.insertSampleData(dao);
+            if (dao.countBooks() == 0) {
+                SeedData.insertSampleData(dao);
+            }
 
             List<Book> audiobooks = dao.getBooksByType("AUDIOBOOK");
 
@@ -62,6 +95,125 @@ public class MainActivity extends BaseActivity {
                 setupBookClick(R.id.ivGridCover3, 2);
             });
         }).start();
+    }
+
+    /**
+     * Tự động đẩy dữ liệu mẫu lên Firestore (bao gồm Category giống mydio.vn)
+     */
+    private void seedFirestoreIfNecessary() {
+        SharedPreferences prefs = getSharedPreferences("fonos_sync", MODE_PRIVATE);
+        if (prefs.getBoolean("firestore_seeded_v4", false)) {
+            Log.d("FonosClone", "Firestore already seeded v4. Skipping.");
+            return;
+        }
+
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+        // 1. Tạo danh sách sách mẫu kèm Category tương ứng như mydio.vn
+        List<Book> sampleBooks = new ArrayList<>();
+        sampleBooks.add(new Book("Hậu Hồng Lâu Mộng", "Tào Tuyết Cần", "AUDIOBOOK", "hau_hong_lau_mong", "demo_audio", true, "Văn học & Truyện"));
+        sampleBooks.add(new Book("Tại sao người thông minh dễ tổn thương", "Đặng cập nhật", "AUDIOBOOK", "tai_sao_nguoi_thong_minh_de_ton_thuong", "demo_audio", false, "Tâm lý học"));
+        sampleBooks.add(new Book("Bông hồng nhung", "Nhiều tác giả", "AUDIOBOOK", "bong_hong_nhung", "demo_audio", false, "Văn học & Truyện"));
+        sampleBooks.add(new Book("Những người khốn khổ", "Victor Hugo", "AUDIOBOOK", "nhung_nguoi_khon_kho", "demo_audio", true, "Văn học & Truyện"));
+        sampleBooks.add(new Book("Lá bài chủ", "Đặng cập nhật", "AUDIOBOOK", "la_bai_chu", "demo_audio", false, "Văn học & Truyện"));
+        sampleBooks.add(new Book("Bên kia bức tường", "Nguyễn Nhật Ánh", "AUDIOBOOK", "ben_kia_buc_tuong", "demo_audio", false, "Thiếu nhi"));
+        sampleBooks.add(new Book("Mùi hương", "Patrick Suskind", "AUDIOBOOK", "mui_huong", "demo_audio", false, "Văn học & Truyện"));
+        
+        sampleBooks.add(new Book("Ra quyết định thông minh", "Đặng cập nhật", "EBOOK", "ra_quyet_dinh_thong_minh", "demo_audio", false, "Kinh doanh"));
+        sampleBooks.add(new Book("Khéo ăn nói được thiên hạ", "Trác Nhã", "EBOOK", "kheo_an_noi_duok_thien_ha", "demo_audio", false, "Kỹ năng sống"));
+        sampleBooks.add(new Book("Xây dựng đội nhóm hiệu suất cao", "Đặng cập nhật", "EBOOK", "xay_dung_doi_nhom_hieu_suat_cao", "demo_audio", true, "Kinh doanh"));
+        
+        sampleBooks.add(new Book("Nghĩ giàu và làm giàu", "Napoleon Hill", "SUMMARY", "nghi_giau_va_lam_giau", "demo_audio", false, "Kinh doanh"));
+        sampleBooks.add(new Book("Luyện trí nhớ", "Đặng cập nhật", "SUMMARY", "luyen_tri_nho", "demo_audio", false, "Kỹ năng sống"));
+
+        // 2. Tạo danh sách khóa học mẫu
+        List<PodCourse> sampleCourses = new ArrayList<>();
+        sampleCourses.add(new PodCourse("AI for Beginners", "Nam Nguyễn", "Technology", "#1E8080", 4.8));
+        sampleCourses.add(new PodCourse("Management for First-Time Leaders", "Vũ Đức Trí", "Management", "#7A5540", 4.7));
+        sampleCourses.add(new PodCourse("Personal Finance Thinking", "Trần Việt Quân", "Finance", "#1A3A5C", 4.7));
+        sampleCourses.add(new PodCourse("Kỹ năng Thuyết trình Chuyên nghiệp", "Nhiều tác giả", "Soft Skills", "#5A3E91", 4.6));
+
+        int totalWrites = sampleBooks.size() + sampleCourses.size();
+        final int[] completedWrites = {0};
+        final boolean[] hasShownError = {false};
+
+        Log.d("FonosClone", "Starting Firestore auto-seeding v4. Total writes: " + totalWrites);
+
+        // Gửi thông báo bắt đầu đồng bộ
+        Toast.makeText(this, "Đang đồng bộ dữ liệu kèm Category kiểu mydio.vn...", Toast.LENGTH_SHORT).show();
+
+        // Ghi sách
+        int bookId = 1;
+        for (Book book : sampleBooks) {
+            book.id = bookId;
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", book.id);
+            map.put("title", book.title);
+            map.put("author", book.author);
+            map.put("type", book.type);
+            map.put("coverImage", book.coverImage);
+            map.put("audioResName", book.audioResName);
+            map.put("isFavorite", book.isFavorite);
+            map.put("category", book.category); // Thêm cột Category vào Firestore!
+
+            firestore.collection("books").document("book_" + book.id).set(map)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        completedWrites[0]++;
+                        checkSeedingFinished(completedWrites[0], totalWrites, prefs);
+                    } else {
+                        if (!hasShownError[0]) {
+                            hasShownError[0] = true;
+                            String error = task.getException() != null ? task.getException().getMessage() : "Permission Denied hoặc lỗi mạng";
+                            Log.e("FonosClone", "Seeding failed: " + error);
+                            Toast.makeText(MainActivity.this, "Đồng bộ thất bại: " + error, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            bookId++;
+        }
+
+        // Ghi khóa học
+        int courseId = 1;
+        for (PodCourse course : sampleCourses) {
+            course.id = courseId;
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", course.id);
+            map.put("title", course.title);
+            map.put("teacher", course.teacher);
+            map.put("category", course.category);
+            map.put("coverColor", course.coverColor);
+            map.put("rating", course.rating);
+
+            firestore.collection("pod_courses").document("course_" + course.id).set(map)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        completedWrites[0]++;
+                        checkSeedingFinished(completedWrites[0], totalWrites, prefs);
+                    } else {
+                        if (!hasShownError[0]) {
+                            hasShownError[0] = true;
+                            String error = task.getException() != null ? task.getException().getMessage() : "Permission Denied hoặc lỗi mạng";
+                            Log.e("FonosClone", "Seeding failed: " + error);
+                            Toast.makeText(MainActivity.this, "Đồng bộ thất bại: " + error, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            courseId++;
+        }
+    }
+
+    private void checkSeedingFinished(int completed, int total, SharedPreferences prefs) {
+        Log.d("FonosClone", "Write progress: " + completed + "/" + total);
+        if (completed == total) {
+            Log.d("FonosClone", "All records successfully seeded to Firestore!");
+            Toast.makeText(this, "Đồng bộ CSDL category kiểu mydio.vn thành công!", Toast.LENGTH_LONG).show();
+            prefs.edit().putBoolean("firestore_seeded_v4", true).apply();
+            
+            // Tải lại sách sau khi đồng bộ thành công
+            AppDatabase db = AppDatabase.getInstance(this);
+            loadLocalBooks(db);
+        }
     }
 
     private void setupBookClick(int viewId, int bookIndex) {

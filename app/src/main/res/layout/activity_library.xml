@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -41,38 +41,6 @@
                 app:tint="#B0B0B0" />
         </LinearLayout>
 
-        <!-- SEARCH BOX -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/card_white_round"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@android:drawable/ic_menu_search"
-                android:contentDescription="@string/search_icon_desc"
-                app:tint="#1A1A2E" />
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="12dp"
-                android:background="@null"
-                android:hint="@string/search_hint"
-                android:inputType="text"
-                android:textColor="#1A1A2E"
-                android:textColorHint="#9AAABB"
-                android:textSize="14sp" />
-        </LinearLayout>
-
         <!-- TABS -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -83,11 +51,15 @@
             android:baselineAligned="false">
 
             <LinearLayout
+                android:id="@+id/tabDownloaded"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
                 android:orientation="vertical"
                 android:paddingEnd="24dp">
                 <TextView
+                    android:id="@+id/tvTabDownloaded"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/tab_downloaded"
@@ -96,36 +68,55 @@
                     android:textStyle="bold"
                     android:paddingBottom="8dp" />
                 <View
+                    android:id="@+id/indicatorDownloaded"
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
                     android:background="#F07830" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/tabPurchased"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
                 android:orientation="vertical"
                 android:paddingEnd="24dp">
                 <TextView
+                    android:id="@+id/tvTabPurchased"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/tab_purchased"
                     android:textColor="#D6DDFE"
                     android:textSize="14sp"
                     android:paddingBottom="10dp" />
+                <View
+                    android:id="@+id/indicatorPurchased"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#00000000" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/tabFavorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
                 android:orientation="vertical">
                 <TextView
+                    android:id="@+id/tvTabFavorite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/tab_favorite"
                     android:textColor="#D6DDFE"
                     android:textSize="14sp"
                     android:paddingBottom="10dp" />
+                <View
+                    android:id="@+id/indicatorFavorite"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#00000000" />
             </LinearLayout>
         </LinearLayout>
 
@@ -134,15 +125,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/card_white_round"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="12dp"
+            android:padding="12dp">
 
+            <!-- Empty State View -->
             <LinearLayout
+                android:id="@+id/emptyStateContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="32dp">
+                android:visibility="gone">
 
                 <ImageView
                     android:layout_width="80dp"
@@ -159,17 +153,23 @@
                     android:text="@string/no_books_yet"
                     android:textColor="#7D88A6"
                     android:textSize="14sp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="@string/browse_store"
-                    android:textColor="#FFFFFF"
-                    app:backgroundTint="#F07830"
-                    app:cornerRadius="24dp"
-                    android:textAllCaps="false" />
             </LinearLayout>
+
+            <!-- Dynamic Book List -->
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scrollViewContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:visibility="visible">
+
+                <LinearLayout
+                    android:id="@+id/bookListContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </androidx.core.widget.NestedScrollView>
+
         </FrameLayout>
 
     </LinearLayout>

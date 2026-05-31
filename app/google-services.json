@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "19500543058",
+    "project_id": "fonosclone",
+    "storage_bucket": "fonosclone.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:19500543058:android:471a6a5fc46e61ab3d038b",
+        "android_client_info": {
+          "package_name": "hcmute.com.fonosclone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDChS7_UVJ4r2LFFaW81bhN05q3GybBW24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

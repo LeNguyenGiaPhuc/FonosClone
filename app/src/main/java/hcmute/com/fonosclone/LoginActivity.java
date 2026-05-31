@@ -1,5 +1,6 @@
 package hcmute.com.fonosclone;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -9,6 +10,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -68,19 +73,49 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        if (!sessionManager.hasRegisteredUser()) {
-            Toast.makeText(this, R.string.error_no_registered_account, Toast.LENGTH_SHORT).show();
-            return;
-        }
+        // Show progress dialog
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Đang đăng nhập...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
-        if (!sessionManager.canLogin(email, password)) {
-            Toast.makeText(this, R.string.error_wrong_credentials, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        sessionManager.loginRegisteredUser();
-        Toast.makeText(this, R.string.login_success, Toast.LENGTH_SHORT).show();
-        openHome();
+        // Sign in via Firebase Auth
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user != null) {
+                            // Fetch user's profile metadata from Firestore to sync their real display name
+                            FirebaseFirestore.getInstance().collection("users")
+                                    .document(user.getUid())
+                                    .get()
+                                    .addOnCompleteListener(docTask -> {
+                                        progressDialog.dismiss();
+                                        String name = user.getDisplayName();
+                                        if (docTask.isSuccessful() && docTask.getResult() != null && docTask.getResult().exists()) {
+                                            String firestoreName = docTask.getResult().getString("name");
+                                            if (firestoreName != null && !firestoreName.isEmpty()) {
+                                                name = firestoreName;
+                                            }
+                                        }
+                                        if (name == null || name.isEmpty()) {
+                                            name = "Thành viên Fonos";
+                                        }
+                                        // Cache session locally in SessionManager for fast offline check
+                                        sessionManager.login(name, email);
+                                        Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
+                                        openHome();
+                                    });
+                        } else {
+                            progressDialog.dismiss();
+                            Toast.makeText(LoginActivity.this, "Đã xảy ra lỗi hệ thống!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        progressDialog.dismiss();
+                        String error = task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng nhập thất bại";
+                        Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private void openHome() {

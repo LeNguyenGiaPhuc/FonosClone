@@ -44,6 +44,7 @@ public class AudioPlayerService extends Service {
     };
     private int currentAudioResId;
     private String currentAudioResName = "";
+    private String currentAudioUrl = "";
     private String currentTitle = "";
     private String currentAuthor = "";
 
@@ -83,35 +84,72 @@ public class AudioPlayerService extends Service {
     }
 
     private void play(String audioResName) {
-        int audioResId = 0;
-        if (audioResName != null && !audioResName.isEmpty()) {
-            audioResId = getResources().getIdentifier(audioResName, "raw", getPackageName());
-        }
-        if (audioResId == 0 && currentAudioResId != 0) {
-            audioResId = currentAudioResId;
-        }
-        if (audioResId == 0) {
-            audioResId = R.raw.demo_audio;
-            currentAudioResName = "demo_audio";
+        if (audioResName == null || audioResName.isEmpty()) {
+            audioResName = "demo_audio";
         }
 
-        if (mediaPlayer == null || currentAudioResId != audioResId) {
-            releasePlayer();
-            currentAudioResId = audioResId;
-            mediaPlayer = MediaPlayer.create(this, audioResId);
-            mediaPlayer.setOnCompletionListener(mp -> {
-                sendProgressUpdate();
-                stopForeground(false);
-            });
-        }
+        boolean isUrl = audioResName.startsWith("http://") || audioResName.startsWith("https://");
 
-        if (!mediaPlayer.isPlaying()) {
-            mediaPlayer.start();
-        }
+        if (isUrl) {
+            // Case 1: Playing a Cloud Streaming URL (e.g. Firebase Storage)
+            if (mediaPlayer == null || !currentAudioUrl.equals(audioResName)) {
+                releasePlayer();
+                currentAudioUrl = audioResName;
+                currentAudioResName = audioResName;
+                try {
+                    mediaPlayer = new MediaPlayer();
+                    mediaPlayer.setDataSource(audioResName);
+                    mediaPlayer.setOnPreparedListener(mp -> {
+                        if (mediaPlayer != null) {
+                            mediaPlayer.start();
+                            progressHandler.removeCallbacks(progressRunnable);
+                            progressHandler.post(progressRunnable);
+                            startForeground(NOTIFICATION_ID, buildNotification(true));
+                        }
+                    });
+                    mediaPlayer.setOnCompletionListener(mp -> {
+                        sendProgressUpdate();
+                        stopForeground(false);
+                    });
+                    mediaPlayer.prepareAsync(); // Prepare asynchronously to keep the UI fluid!
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                if (!mediaPlayer.isPlaying()) {
+                    mediaPlayer.start();
+                }
+                progressHandler.removeCallbacks(progressRunnable);
+                progressHandler.post(progressRunnable);
+                startForeground(NOTIFICATION_ID, buildNotification(true));
+            }
+        } else {
+            // Case 2: Playing a Local Raw Resource
+            int audioResId = getResources().getIdentifier(audioResName, "raw", getPackageName());
+            if (audioResId == 0) {
+                audioResId = R.raw.demo_audio;
+                currentAudioResName = "demo_audio";
+            }
 
-        progressHandler.removeCallbacks(progressRunnable);
-        progressHandler.post(progressRunnable);
-        startForeground(NOTIFICATION_ID, buildNotification(true));
+            if (mediaPlayer == null || currentAudioResId != audioResId || !currentAudioUrl.isEmpty()) {
+                releasePlayer();
+                currentAudioResId = audioResId;
+                currentAudioUrl = ""; // clear URL
+                mediaPlayer = MediaPlayer.create(this, audioResId);
+                mediaPlayer.setOnCompletionListener(mp -> {
+                    sendProgressUpdate();
+                    stopForeground(false);
+                });
+            }
+
+            if (!mediaPlayer.isPlaying()) {
+                mediaPlayer.start();
+            }
+
+            progressHandler.removeCallbacks(progressRunnable);
+            progressHandler.post(progressRunnable);
+            startForeground(NOTIFICATION_ID, buildNotification(true));
+        }
     }
 
     private void pause() {
@@ -135,6 +173,7 @@ public class AudioPlayerService extends Service {
             mediaPlayer.release();
             mediaPlayer = null;
             currentAudioResId = 0;
+            currentAudioUrl = "";
         }
     }
 

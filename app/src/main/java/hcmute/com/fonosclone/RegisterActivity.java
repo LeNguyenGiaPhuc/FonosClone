@@ -1,5 +1,6 @@
 package hcmute.com.fonosclone;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -10,6 +11,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -79,10 +88,55 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        sessionManager.registerUser(name, email, pass);
-        sessionManager.login(name, email);
-        Toast.makeText(this, getString(R.string.register_success, name), Toast.LENGTH_LONG).show();
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+        // Show progress dialog during registration
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Đang đăng ký tài khoản...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        // Register user via Firebase Auth
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, pass)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user != null) {
+                            // Update display name in Firebase Profile
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(name)
+                                    .build();
+
+                            user.updateProfile(profileUpdates).addOnCompleteListener(profileTask -> {
+                                // Save profile metadata in Firestore users collection
+                                Map<String, Object> userData = new HashMap<>();
+                                userData.put("uid", user.getUid());
+                                userData.put("name", name);
+                                userData.put("email", email);
+                                userData.put("createdAt", System.currentTimeMillis());
+
+                                FirebaseFirestore.getInstance().collection("users")
+                                        .document(user.getUid())
+                                        .set(userData)
+                                        .addOnCompleteListener(firestoreTask -> {
+                                            progressDialog.dismiss();
+                                            // Cache session in SessionManager for local speed
+                                            sessionManager.login(name, email);
+                                            Toast.makeText(RegisterActivity.this, getString(R.string.register_success, name), Toast.LENGTH_LONG).show();
+                                            
+                                            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            startActivity(intent);
+                                            finish();
+                                        });
+                            });
+                        } else {
+                            progressDialog.dismiss();
+                            Toast.makeText(RegisterActivity.this, "Đã xảy ra lỗi hệ thống!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        progressDialog.dismiss();
+                        String error = task.getException() != null ? task.getException().getLocalizedMessage() : "Đăng ký thất bại";
+                        Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }

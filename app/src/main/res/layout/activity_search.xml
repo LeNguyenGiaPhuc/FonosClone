@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -112,393 +112,364 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <!-- Promo card -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="150dp"
-                        app:cardCornerRadius="14dp"
-                        app:cardElevation="0dp">
-
-                        <FrameLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="#1A2B5F"
-                                android:orientation="vertical"
-                                android:padding="20dp">
-
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/search_promo_title"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="18sp"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="12dp"
-                                    android:lineSpacingExtra="3dp"
-                                    android:text="@string/search_promo_subtitle"
-                                    android:textColor="#D6DDFE"
-                                    android:textSize="15sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="18dp"
-                                    android:text="@string/search_promo_badge"
-                                    android:textColor="#F07830"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-                            </LinearLayout>
-
-                            <ImageView
-                                android:layout_width="84dp"
-                                android:layout_height="84dp"
-                                android:layout_gravity="bottom|end"
-                                android:layout_marginEnd="18dp"
-                                android:layout_marginBottom="12dp"
-                                android:alpha="0.25"
-                                android:src="@android:drawable/ic_media_play"
-                                app:tint="#FFFFFF" />
-                        </FrameLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Category grid -->
+                    <!-- Dynamic Results (Hidden by default) -->
                     <LinearLayout
+                        android:id="@+id/resultsContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:visibility="gone">
 
-                        <!-- Row 1 -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:baselineAligned="false"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingBottom="12dp">
 
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/cardAudiobooks"
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnBackToCategories"
+                                style="@style/Widget.MaterialComponents.Button.TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="← Quay lại"
+                                android:textColor="#F07830"
+                                android:textSize="14sp"
+                                android:textAllCaps="false"/>
+
+                            <TextView
+                                android:id="@+id/tvResultsTitle"
                                 android:layout_width="0dp"
-                                android:layout_height="120dp"
-                                android:layout_marginEnd="8dp"
+                                android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:clickable="true"
-                                android:focusable="true"
-                                app:cardCornerRadius="12dp"
-                                app:cardElevation="0dp">
-
-                                <FrameLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="#7A4A2E">
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:layout_margin="14dp"
-                                        android:text="@string/category_audiobooks"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="18sp"
-                                        android:textStyle="bold" />
-
-                                    <ImageView
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_gravity="bottom|start"
-                                        android:layout_marginStart="14dp"
-                                        android:layout_marginBottom="14dp"
-                                        android:src="@android:drawable/ic_media_play"
-                                        app:tint="#CCFFFFFF" />
-                                </FrameLayout>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/cardEnglishBooks"
-                                android:layout_width="0dp"
-                                android:layout_height="120dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_weight="1"
-                                android:clickable="true"
-                                android:focusable="true"
-                                app:cardCornerRadius="12dp"
-                                app:cardElevation="0dp">
-
-                                <FrameLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="#4B3B96">
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:layout_margin="14dp"
-                                        android:text="@string/category_english_books"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="18sp"
-                                        android:textStyle="bold" />
-
-                                    <ImageView
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_gravity="bottom|start"
-                                        android:layout_marginStart="14dp"
-                                        android:layout_marginBottom="14dp"
-                                        android:src="@android:drawable/ic_menu_upload"
-                                        app:tint="#CCFFFFFF" />
-                                </FrameLayout>
-                            </com.google.android.material.card.MaterialCardView>
+                                android:text="Thể loại: Văn học"
+                                android:textColor="#1A2B5F"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:gravity="end" />
                         </LinearLayout>
 
-                        <!-- Row 2 -->
                         <LinearLayout
+                            android:id="@+id/searchBookListContainer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:baselineAligned="false"
-                            android:orientation="horizontal">
+                            android:orientation="vertical" />
+                    </LinearLayout>
 
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/cardEbooks"
-                                android:layout_width="0dp"
-                                android:layout_height="120dp"
-                                android:layout_marginEnd="8dp"
-                                android:layout_weight="1"
-                                android:clickable="true"
-                                android:focusable="true"
-                                app:cardCornerRadius="12dp"
-                                app:cardElevation="0dp">
+                    <!-- Default Main Content Container (Promo + Categories) -->
+                    <LinearLayout
+                        android:id="@+id/defaultSearchContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="visible">
 
-                                <FrameLayout
+                        <!-- Promo card -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp">
+
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:background="#3E7B3C">
+                                    android:background="#1A2B5F"
+                                    android:orientation="vertical"
+                                    android:padding="20dp">
 
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_margin="14dp"
-                                        android:text="@string/category_ebooks"
+                                        android:text="@string/search_promo_title"
                                         android:textColor="#FFFFFF"
                                         android:textSize="18sp"
                                         android:textStyle="bold" />
-
-                                    <ImageView
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_gravity="bottom|start"
-                                        android:layout_marginStart="14dp"
-                                        android:layout_marginBottom="14dp"
-                                        android:src="@android:drawable/ic_menu_agenda"
-                                        app:tint="#CCFFFFFF" />
-                                </FrameLayout>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/cardSummaries"
-                                android:layout_width="0dp"
-                                android:layout_height="120dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_weight="1"
-                                android:clickable="true"
-                                android:focusable="true"
-                                app:cardCornerRadius="12dp"
-                                app:cardElevation="0dp">
-
-                                <FrameLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="#946B00">
 
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:layout_margin="14dp"
-                                        android:text="@string/category_summaries"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="18sp"
+                                        android:layout_marginTop="12dp"
+                                        android:lineSpacingExtra="3dp"
+                                        android:text="@string/search_promo_subtitle"
+                                        android:textColor="#D6DDFE"
+                                        android:textSize="15sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="18dp"
+                                        android:text="Khám phá các thể loại giống mydio.vn"
+                                        android:textColor="#F07830"
+                                        android:textSize="14sp"
                                         android:textStyle="bold" />
+                                </LinearLayout>
 
-                                    <ImageView
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_gravity="bottom|start"
-                                        android:layout_marginStart="14dp"
-                                        android:layout_marginBottom="14dp"
-                                        android:src="@android:drawable/ic_menu_edit"
-                                        app:tint="#CCFFFFFF" />
-                                </FrameLayout>
-                            </com.google.android.material.card.MaterialCardView>
-                        </LinearLayout>
+                                <ImageView
+                                    android:layout_width="84dp"
+                                    android:layout_height="84dp"
+                                    android:layout_gravity="bottom|end"
+                                    android:layout_marginEnd="18dp"
+                                    android:layout_marginBottom="12dp"
+                                    android:alpha="0.25"
+                                    android:src="@android:drawable/ic_media_play"
+                                    app:tint="#FFFFFF" />
+                            </FrameLayout>
+                        </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Row 3 -->
+                        <!-- Category grid -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
-                            android:baselineAligned="false"
-                            android:orientation="horizontal">
+                            android:orientation="vertical">
 
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/cardChildren"
-                                android:layout_width="0dp"
-                                android:layout_height="120dp"
-                                android:layout_marginEnd="8dp"
-                                android:layout_weight="1"
-                                android:clickable="true"
-                                android:focusable="true"
-                                app:cardCornerRadius="12dp"
-                                app:cardElevation="0dp">
+                            <!-- Row 1 -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:baselineAligned="false"
+                                android:orientation="horizontal">
 
-                                <FrameLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="#A7444C">
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardVanHoc"
+                                    android:layout_width="0dp"
+                                    android:layout_height="120dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_weight="1"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    app:cardCornerRadius="12dp"
+                                    app:cardElevation="0dp">
 
-                                    <TextView
+                                    <FrameLayout
                                         android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:layout_margin="14dp"
-                                        android:text="@string/category_children"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="18sp"
-                                        android:textStyle="bold" />
+                                        android:layout_height="match_parent"
+                                        android:background="#7A4A2E">
 
-                                    <ImageView
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_gravity="bottom|start"
-                                        android:layout_marginStart="14dp"
-                                        android:layout_marginBottom="14dp"
-                                        android:src="@android:drawable/ic_menu_gallery"
-                                        app:tint="#CCFFFFFF" />
-                                </FrameLayout>
-                            </com.google.android.material.card.MaterialCardView>
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_margin="14dp"
+                                            android:text="Văn học &amp; Truyện"
+                                            android:textColor="#FFFFFF"
+                                            android:textSize="16sp"
+                                            android:textStyle="bold" />
 
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/cardMeditation"
-                                android:layout_width="0dp"
-                                android:layout_height="120dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_weight="1"
-                                android:clickable="true"
-                                android:focusable="true"
-                                app:cardCornerRadius="12dp"
-                                app:cardElevation="0dp">
+                                        <ImageView
+                                            android:layout_width="38dp"
+                                            android:layout_height="38dp"
+                                            android:layout_gravity="bottom|start"
+                                            android:layout_marginStart="14dp"
+                                            android:layout_marginBottom="14dp"
+                                            android:src="@android:drawable/ic_media_play"
+                                            app:tint="#CCFFFFFF" />
+                                    </FrameLayout>
+                                </com.google.android.material.card.MaterialCardView>
 
-                                <FrameLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="#2D8C92">
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardKyNang"
+                                    android:layout_width="0dp"
+                                    android:layout_height="120dp"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_weight="1"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    app:cardCornerRadius="12dp"
+                                    app:cardElevation="0dp">
 
-                                    <TextView
+                                    <FrameLayout
                                         android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:layout_margin="14dp"
-                                        android:text="@string/category_meditation"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="18sp"
-                                        android:textStyle="bold" />
+                                        android:layout_height="match_parent"
+                                        android:background="#4B3B96">
 
-                                    <ImageView
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_gravity="bottom|start"
-                                        android:layout_marginStart="14dp"
-                                        android:layout_marginBottom="14dp"
-                                        android:src="@android:drawable/ic_menu_compass"
-                                        app:tint="#CCFFFFFF" />
-                                </FrameLayout>
-                            </com.google.android.material.card.MaterialCardView>
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_margin="14dp"
+                                            android:text="Kỹ năng sống"
+                                            android:textColor="#FFFFFF"
+                                            android:textSize="16sp"
+                                            android:textStyle="bold" />
+
+                                        <ImageView
+                                            android:layout_width="38dp"
+                                            android:layout_height="38dp"
+                                            android:layout_gravity="bottom|start"
+                                            android:layout_marginStart="14dp"
+                                            android:layout_marginBottom="14dp"
+                                            android:src="@android:drawable/ic_menu_upload"
+                                            app:tint="#CCFFFFFF" />
+                                    </FrameLayout>
+                                </com.google.android.material.card.MaterialCardView>
+                            </LinearLayout>
+
+                            <!-- Row 2 -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:baselineAligned="false"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardKinhDoanh"
+                                    android:layout_width="0dp"
+                                    android:layout_height="120dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_weight="1"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    app:cardCornerRadius="12dp"
+                                    app:cardElevation="0dp">
+
+                                    <FrameLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="#3E7B3C">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_margin="14dp"
+                                            android:text="Kinh doanh"
+                                            android:textColor="#FFFFFF"
+                                            android:textSize="16sp"
+                                            android:textStyle="bold" />
+
+                                        <ImageView
+                                            android:layout_width="38dp"
+                                            android:layout_height="38dp"
+                                            android:layout_gravity="bottom|start"
+                                            android:layout_marginStart="14dp"
+                                            android:layout_marginBottom="14dp"
+                                            android:src="@android:drawable/ic_menu_agenda"
+                                            app:tint="#CCFFFFFF" />
+                                    </FrameLayout>
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardThieuNhi"
+                                    android:layout_width="0dp"
+                                    android:layout_height="120dp"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_weight="1"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    app:cardCornerRadius="12dp"
+                                    app:cardElevation="0dp">
+
+                                    <FrameLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="#A7444C">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_margin="14dp"
+                                            android:text="Thiếu nhi"
+                                            android:textColor="#FFFFFF"
+                                            android:textSize="16sp"
+                                            android:textStyle="bold" />
+
+                                        <ImageView
+                                            android:layout_width="38dp"
+                                            android:layout_height="38dp"
+                                            android:layout_gravity="bottom|start"
+                                            android:layout_marginStart="14dp"
+                                            android:layout_marginBottom="14dp"
+                                            android:src="@android:drawable/ic_menu_gallery"
+                                            app:tint="#CCFFFFFF" />
+                                    </FrameLayout>
+                                </com.google.android.material.card.MaterialCardView>
+                            </LinearLayout>
+
+                            <!-- Row 3 -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="16dp"
+                                android:baselineAligned="false"
+                                android:orientation="horizontal">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardTamLy"
+                                    android:layout_width="0dp"
+                                    android:layout_height="120dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_weight="1"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    app:cardCornerRadius="12dp"
+                                    app:cardElevation="0dp">
+
+                                    <FrameLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="#946B00">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_margin="14dp"
+                                            android:text="Tâm lý học"
+                                            android:textColor="#FFFFFF"
+                                            android:textSize="16sp"
+                                            android:textStyle="bold" />
+
+                                        <ImageView
+                                            android:layout_width="38dp"
+                                            android:layout_height="38dp"
+                                            android:layout_gravity="bottom|start"
+                                            android:layout_marginStart="14dp"
+                                            android:layout_marginBottom="14dp"
+                                            android:src="@android:drawable/ic_menu_edit"
+                                            app:tint="#CCFFFFFF" />
+                                    </FrameLayout>
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/cardTamLinh"
+                                    android:layout_width="0dp"
+                                    android:layout_height="120dp"
+                                    android:layout_marginStart="8dp"
+                                    android:layout_weight="1"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    app:cardCornerRadius="12dp"
+                                    app:cardElevation="0dp">
+
+                                    <FrameLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:background="#2D8C92">
+
+                                        <TextView
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_margin="14dp"
+                                            android:text="Tâm linh"
+                                            android:textColor="#FFFFFF"
+                                            android:textSize="16sp"
+                                            android:textStyle="bold" />
+
+                                        <ImageView
+                                            android:layout_width="38dp"
+                                            android:layout_height="38dp"
+                                            android:layout_gravity="bottom|start"
+                                            android:layout_marginStart="14dp"
+                                            android:layout_marginBottom="14dp"
+                                            android:src="@android:drawable/ic_menu_compass"
+                                            app:tint="#CCFFFFFF" />
+                                    </FrameLayout>
+                                </com.google.android.material.card.MaterialCardView>
+                            </LinearLayout>
                         </LinearLayout>
-
-                        <!-- Row 4 -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:baselineAligned="false"
-                            android:orientation="horizontal">
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/cardSleepMusic"
-                                android:layout_width="0dp"
-                                android:layout_height="120dp"
-                                android:layout_marginEnd="8dp"
-                                android:layout_weight="1"
-                                android:clickable="true"
-                                android:focusable="true"
-                                app:cardCornerRadius="12dp"
-                                app:cardElevation="0dp">
-
-                                <FrameLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="#5B4FB2">
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:layout_margin="14dp"
-                                        android:text="@string/category_sleep_music"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="18sp"
-                                        android:textStyle="bold" />
-
-                                    <ImageView
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_gravity="bottom|start"
-                                        android:layout_marginStart="14dp"
-                                        android:layout_marginBottom="14dp"
-                                        android:src="@android:drawable/ic_media_ff"
-                                        app:tint="#CCFFFFFF" />
-                                </FrameLayout>
-                            </com.google.android.material.card.MaterialCardView>
-
-                            <com.google.android.material.card.MaterialCardView
-                                android:id="@+id/cardPodcast"
-                                android:layout_width="0dp"
-                                android:layout_height="120dp"
-                                android:layout_marginStart="8dp"
-                                android:layout_weight="1"
-                                android:clickable="true"
-                                android:focusable="true"
-                                app:cardCornerRadius="12dp"
-                                app:cardElevation="0dp">
-
-                                <FrameLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:background="#128C2E">
-
-                                    <TextView
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:layout_margin="14dp"
-                                        android:text="@string/category_podcast"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="18sp"
-                                        android:textStyle="bold" />
-
-                                    <ImageView
-                                        android:layout_width="38dp"
-                                        android:layout_height="38dp"
-                                        android:layout_gravity="bottom|start"
-                                        android:layout_marginStart="14dp"
-                                        android:layout_marginBottom="14dp"
-                                        android:src="@android:drawable/ic_btn_speak_now"
-                                        app:tint="#CCFFFFFF" />
-                                </FrameLayout>
-                            </com.google.android.material.card.MaterialCardView>
-                        </LinearLayout>
-
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

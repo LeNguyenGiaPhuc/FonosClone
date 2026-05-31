@@ -101,7 +101,8 @@ public final class BookListRenderer {
         textColumn.addView(authorView);
 
         TextView typeView = new TextView(activity);
-        typeView.setText(book.type);
+        String subText = (book.category != null ? book.category : "Kỹ năng sống") + " | " + book.type;
+        typeView.setText(subText);
         typeView.setTextColor(Color.parseColor("#F07830"));
         typeView.setTextSize(11);
         typeView.setPadding(0, dp(activity, 6), 0, 0);

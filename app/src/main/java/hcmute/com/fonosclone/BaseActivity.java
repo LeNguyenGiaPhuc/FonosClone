@@ -15,6 +15,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class BaseActivity extends AppCompatActivity {
 
     protected static final int NAV_BOOKS = 0;
@@ -89,6 +91,7 @@ public class BaseActivity extends AppCompatActivity {
                     startActivity(new Intent(this, ProfileActivity.class));
                     return true;
                 } else if (id == R.id.menu_logout) {
+                    FirebaseAuth.getInstance().signOut();
                     sessionManager.logout();
                     Intent intent = new Intent(this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

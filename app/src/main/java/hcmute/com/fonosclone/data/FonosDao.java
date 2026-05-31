@@ -2,16 +2,23 @@ package hcmute.com.fonosclone.data;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import java.util.List;
 
 @Dao
 public interface FonosDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertBook(Book book);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertBooks(List<Book> books);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertPodCourse(PodCourse podCourse);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertPodCourses(List<PodCourse> podCourses);
 
     @Insert
     void insertListeningHistory(ListeningHistory history);
@@ -42,4 +49,10 @@ public interface FonosDao {
 
     @Query("SELECT * FROM pod_courses")
     List<PodCourse> getPodCourses();
+
+    @Query("DELETE FROM books")
+    void deleteAllBooks();
+
+    @Query("DELETE FROM pod_courses")
+    void deleteAllPodCourses();
 }
