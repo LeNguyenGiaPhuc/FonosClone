@@ -14,6 +14,8 @@ public final class BookNavigator {
         intent.putExtra(AudioPlayerService.EXTRA_TITLE, book.title);
         intent.putExtra(AudioPlayerService.EXTRA_AUTHOR, book.author);
         intent.putExtra(AudioPlayerService.EXTRA_AUDIO_RES, book.audioResName);
+        intent.putExtra(AudioPlayerService.EXTRA_AUDIO_URL, book.audioUrl);
+        intent.putExtra(AudioPlayerService.EXTRA_AUDIO_STORAGE_PATH, book.audioStoragePath);
         intent.putExtra(PlayerActivity.EXTRA_BOOK_ID, book.id);
         intent.putExtra("cover_image", book.coverImage);
         context.startActivity(intent);

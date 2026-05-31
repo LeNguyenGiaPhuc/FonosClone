@@ -11,9 +11,19 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import hcmute.com.fonosclone.data.AppDatabase;
 import hcmute.com.fonosclone.data.DownloadedContent;
@@ -27,6 +37,11 @@ public class ContentDownloadService extends Service {
     public static final String EXTRA_CONTENT_ID = "extra_content_id";
     public static final String EXTRA_BOOK_ID = "extra_book_id";
     public static final String EXTRA_TITLE = "extra_title";
+    public static final String EXTRA_AUDIO_RES = "extra_audio_res";
+    public static final String EXTRA_AUDIO_URL = "extra_audio_url";
+    public static final String EXTRA_AUDIO_STORAGE_PATH = "extra_audio_storage_path";
+    public static final String EXTRA_LOCAL_AUDIO_PATH = "extra_local_audio_path";
+    public static final String EXTRA_REMOTE_AUDIO_SOURCE = "extra_remote_audio_source";
     public static final String EXTRA_PROGRESS = "extra_progress";
     public static final String EXTRA_STATUS = "extra_status";
 
@@ -34,6 +49,7 @@ public class ContentDownloadService extends Service {
     public static final String STATUS_COMPLETED = "completed";
     public static final String STATUS_CANCELLED = "cancelled";
 
+    private static final String TAG = "ContentDownloadService";
     private static final String CHANNEL_ID = "content_download";
     private static final int NOTIFICATION_ID = 68;
     private static final int PROGRESS_MAX = 100;
@@ -43,8 +59,14 @@ public class ContentDownloadService extends Service {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private String currentContentId = "";
     private String currentTitle = "";
+    private String currentAudioResName = "";
+    private String currentAudioUrl = "";
+    private String currentAudioStoragePath = "";
     private int currentBookId;
     private int progress;
+    private volatile boolean isCancelled;
+    private String completedLocalAudioPath = "";
+    private String completedRemoteAudioSource = "";
 
     private final Runnable progressRunnable = new Runnable() {
         @Override
@@ -52,11 +74,7 @@ public class ContentDownloadService extends Service {
             progress = Math.min(PROGRESS_MAX, progress + PROGRESS_STEP);
 
             if (progress >= PROGRESS_MAX) {
-                markContentDownloaded();
-                sendProgressBroadcast(STATUS_COMPLETED);
-                showCompletedNotification();
-                stopForeground(false);
-                stopSelf();
+                completeDownload("", firstNonBlank(currentAudioUrl, currentAudioStoragePath, currentAudioResName));
                 return;
             }
 
@@ -71,32 +89,44 @@ public class ContentDownloadService extends Service {
         intent.setAction(ACTION_START_DOWNLOAD);
         intent.putExtra(EXTRA_CONTENT_ID, contentId);
         intent.putExtra(EXTRA_TITLE, title);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent);
-        } else {
-            context.startService(intent);
-        }
+        start(context, intent);
     }
 
     public static void startDownload(Context context, int bookId, String title) {
+        startDownload(context, bookId, title, "", "", "");
+    }
+
+    public static void startDownload(
+            Context context,
+            int bookId,
+            String title,
+            String audioResName,
+            String audioUrl,
+            String audioStoragePath
+    ) {
         Intent intent = new Intent(context, ContentDownloadService.class);
         intent.setAction(ACTION_START_DOWNLOAD);
         intent.putExtra(EXTRA_BOOK_ID, bookId);
         intent.putExtra(EXTRA_CONTENT_ID, "book_" + bookId);
         intent.putExtra(EXTRA_TITLE, title);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent);
-        } else {
-            context.startService(intent);
-        }
+        intent.putExtra(EXTRA_AUDIO_RES, audioResName);
+        intent.putExtra(EXTRA_AUDIO_URL, audioUrl);
+        intent.putExtra(EXTRA_AUDIO_STORAGE_PATH, audioStoragePath);
+        start(context, intent);
     }
 
     public static void cancelDownload(Context context) {
         Intent intent = new Intent(context, ContentDownloadService.class);
         intent.setAction(ACTION_CANCEL_DOWNLOAD);
         context.startService(intent);
+    }
+
+    private static void start(Context context, Intent intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
     }
 
     @Override
@@ -115,6 +145,9 @@ public class ContentDownloadService extends Service {
             currentBookId = intent.getIntExtra(EXTRA_BOOK_ID, 0);
             currentContentId = intent.getStringExtra(EXTRA_CONTENT_ID);
             currentTitle = intent.getStringExtra(EXTRA_TITLE);
+            currentAudioResName = intent.getStringExtra(EXTRA_AUDIO_RES);
+            currentAudioUrl = intent.getStringExtra(EXTRA_AUDIO_URL);
+            currentAudioStoragePath = intent.getStringExtra(EXTRA_AUDIO_STORAGE_PATH);
             if (currentTitle == null || currentTitle.trim().isEmpty()) {
                 currentTitle = getString(R.string.download_default_title);
             }
@@ -134,13 +167,118 @@ public class ContentDownloadService extends Service {
 
     private void startDownloadFlow() {
         handler.removeCallbacks(progressRunnable);
+        isCancelled = false;
         progress = 0;
         sendProgressBroadcast(STATUS_RUNNING);
         startForeground(NOTIFICATION_ID, buildNotification(progress, false));
-        handler.postDelayed(progressRunnable, PROGRESS_DELAY_MS);
+
+        String remoteSource = firstNonBlank(currentAudioUrl, currentAudioStoragePath);
+        if (isBlank(remoteSource)) {
+            handler.postDelayed(progressRunnable, PROGRESS_DELAY_MS);
+            return;
+        }
+
+        if (remoteSource.startsWith("http://") || remoteSource.startsWith("https://")) {
+            downloadFromHttpUrl(remoteSource);
+        } else {
+            downloadFromFirebaseStorage(remoteSource);
+        }
+    }
+
+    private void downloadFromFirebaseStorage(String storagePath) {
+        try {
+            StorageReference reference = storagePath.startsWith("gs://")
+                    ? FirebaseStorage.getInstance().getReferenceFromUrl(storagePath)
+                    : FirebaseStorage.getInstance().getReference().child(storagePath);
+            File destination = getDownloadFile();
+            reference.getFile(destination)
+                    .addOnProgressListener(snapshot -> {
+                        long total = snapshot.getTotalByteCount();
+                        if (total > 0) {
+                            int nextProgress = (int) Math.min(PROGRESS_MAX, (snapshot.getBytesTransferred() * 100) / total);
+                            publishProgress(nextProgress);
+                        }
+                    })
+                    .addOnSuccessListener(snapshot -> completeDownload(destination.getAbsolutePath(), storagePath))
+                    .addOnFailureListener(e -> failDownload(e));
+        } catch (Exception e) {
+            failDownload(e);
+        }
+    }
+
+    private void downloadFromHttpUrl(String audioUrl) {
+        new Thread(() -> {
+            File destination = getDownloadFile();
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL(audioUrl).openConnection();
+                connection.connect();
+                int length = connection.getContentLength();
+                try (InputStream input = connection.getInputStream();
+                     FileOutputStream output = new FileOutputStream(destination)) {
+                    byte[] buffer = new byte[8192];
+                    long downloaded = 0;
+                    int read;
+                    while (!isCancelled && (read = input.read(buffer)) != -1) {
+                        output.write(buffer, 0, read);
+                        downloaded += read;
+                        if (length > 0) {
+                            publishProgress((int) Math.min(PROGRESS_MAX, (downloaded * 100) / length));
+                        }
+                    }
+                }
+                if (isCancelled) {
+                    destination.delete();
+                    return;
+                }
+                completeDownload(destination.getAbsolutePath(), audioUrl);
+            } catch (Exception e) {
+                failDownload(e);
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        }).start();
+    }
+
+    private void publishProgress(int nextProgress) {
+        progress = Math.max(progress, Math.min(PROGRESS_MAX, nextProgress));
+        sendProgressBroadcast(STATUS_RUNNING);
+        updateNotification(progress);
+    }
+
+    private File getDownloadFile() {
+        File directory = new File(getFilesDir(), "downloads");
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        return new File(directory, "book_" + currentBookId + ".mp3");
+    }
+
+    private void completeDownload(String localAudioPath, String remoteAudioSource) {
+        if (isCancelled) {
+            return;
+        }
+        progress = PROGRESS_MAX;
+        completedLocalAudioPath = localAudioPath == null ? "" : localAudioPath;
+        completedRemoteAudioSource = remoteAudioSource == null ? "" : remoteAudioSource;
+        markContentDownloaded(localAudioPath, remoteAudioSource);
+        sendProgressBroadcast(STATUS_COMPLETED);
+        showCompletedNotification();
+        stopForeground(false);
+        stopSelf();
+    }
+
+    private void failDownload(Exception e) {
+        Log.e(TAG, "Download failed", e);
+        sendProgressBroadcast(STATUS_CANCELLED);
+        stopForeground(true);
+        stopSelf();
     }
 
     private void cancelDownloadFlow() {
+        isCancelled = true;
         handler.removeCallbacks(progressRunnable);
         sendProgressBroadcast(STATUS_CANCELLED);
         stopForeground(true);
@@ -206,6 +344,8 @@ public class ContentDownloadService extends Service {
         intent.putExtra(EXTRA_TITLE, currentTitle);
         intent.putExtra(EXTRA_PROGRESS, progress);
         intent.putExtra(EXTRA_STATUS, status);
+        intent.putExtra(EXTRA_LOCAL_AUDIO_PATH, completedLocalAudioPath);
+        intent.putExtra(EXTRA_REMOTE_AUDIO_SOURCE, completedRemoteAudioSource);
         sendBroadcast(intent);
     }
 
@@ -229,7 +369,7 @@ public class ContentDownloadService extends Service {
         super.onDestroy();
     }
 
-    private void markContentDownloaded() {
+    private void markContentDownloaded(String localAudioPath, String remoteAudioSource) {
         if (currentBookId <= 0) {
             return;
         }
@@ -237,7 +377,24 @@ public class ContentDownloadService extends Service {
         new Thread(() -> AppDatabase
                 .getInstance(getApplicationContext())
                 .fonosDao()
-                .upsertDownloadedContent(new DownloadedContent(currentBookId, System.currentTimeMillis()))
+                .upsertDownloadedContent(new DownloadedContent(
+                        currentBookId,
+                        System.currentTimeMillis(),
+                        localAudioPath,
+                        remoteAudioSource
+                ))
         ).start();
+    }
+
+    private static String firstNonBlank(String first, String second, String third) {
+        return !isBlank(first) ? first : (!isBlank(second) ? second : (!isBlank(third) ? third : ""));
+    }
+
+    private static String firstNonBlank(String first, String second) {
+        return !isBlank(first) ? first : (!isBlank(second) ? second : "");
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

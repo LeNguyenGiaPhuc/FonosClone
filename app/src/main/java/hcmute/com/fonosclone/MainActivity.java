@@ -202,6 +202,8 @@ public class MainActivity extends BaseActivity {
             map.put("type", book.type);
             map.put("coverImage", book.coverImage);
             map.put("audioResName", book.audioResName);
+            map.put("audioUrl", book.audioUrl);
+            map.put("audioStoragePath", book.audioStoragePath);
             map.put("isFavorite", book.isFavorite);
             map.put("category", book.category); // Thêm cột Category vào Firestore!
 
@@ -281,6 +283,8 @@ public class MainActivity extends BaseActivity {
         intent.putExtra(AudioPlayerService.EXTRA_TITLE, book.title);
         intent.putExtra(AudioPlayerService.EXTRA_AUTHOR, book.author);
         intent.putExtra(AudioPlayerService.EXTRA_AUDIO_RES, book.audioResName);
+        intent.putExtra(AudioPlayerService.EXTRA_AUDIO_URL, book.audioUrl);
+        intent.putExtra(AudioPlayerService.EXTRA_AUDIO_STORAGE_PATH, book.audioStoragePath);
         intent.putExtra(PlayerActivity.EXTRA_BOOK_ID, book.id);
         intent.putExtra("cover_image", book.coverImage);
         intent.putExtra(AudioPlayerService.EXTRA_START_POSITION_MS, startPositionMs);

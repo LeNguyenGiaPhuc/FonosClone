@@ -41,7 +41,7 @@ public final class FonosRepository {
     }
 
     /**
-     * Đồng bộ danh sách Sách từ Firestore đám mây về Room SQLite cục bộ
+     * Äá»“ng bá»™ danh sÃ¡ch SÃ¡ch tá»« Firestore Ä‘Ã¡m mÃ¢y vá» Room SQLite cá»¥c bá»™
      */
     public void syncBooks(final SyncCallback callback) {
         firestore.collection("books")
@@ -57,12 +57,14 @@ public final class FonosRepository {
                             String type = doc.getString("type");
                             String coverImage = doc.getString("coverImage");
                             String audioResName = doc.getString("audioResName");
+                            String audioUrl = doc.getString("audioUrl");
+                            String audioStoragePath = doc.getString("audioStoragePath");
                             Boolean isFavoriteObj = doc.getBoolean("isFavorite");
                             boolean isFavorite = isFavoriteObj != null ? isFavoriteObj : false;
                             String category = doc.getString("category");
 
                             if (title != null && type != null) {
-                                Book book = new Book(title, author, type, coverImage, audioResName, isFavorite, category);
+                                Book book = new Book(title, author, type, coverImage, audioResName, isFavorite, category, audioUrl, audioStoragePath);
                                 if (id > 0) {
                                     book.id = id;
                                 }
@@ -73,14 +75,14 @@ public final class FonosRepository {
                         }
                     }
 
-                    // Lưu danh sách sách vào Room ở Thread phụ
+                    // LÆ°u danh sÃ¡ch sÃ¡ch vÃ o Room á»Ÿ Thread phá»¥
                     new Thread(() -> {
                         try {
                             if (!books.isEmpty()) {
                                 dao.deleteAllBooks();
                                 dao.insertBooks(books);
                             }
-                            // Báo thành công về UI Thread
+                            // BÃ¡o thÃ nh cÃ´ng vá» UI Thread
                             mainHandler.post(callback::onSuccess);
                         } catch (Exception e) {
                             mainHandler.post(() -> callback.onFailure(e));
@@ -91,7 +93,7 @@ public final class FonosRepository {
     }
 
     /**
-     * Đồng bộ danh sách Khóa học PodCourse từ Firestore đám mây về Room SQLite cục bộ
+     * Äá»“ng bá»™ danh sÃ¡ch KhÃ³a há»c PodCourse tá»« Firestore Ä‘Ã¡m mÃ¢y vá» Room SQLite cá»¥c bá»™
      */
     public void syncPodCourses(final SyncCallback callback) {
         firestore.collection("pod_courses")
@@ -121,14 +123,14 @@ public final class FonosRepository {
                         }
                     }
 
-                    // Lưu danh sách khóa học vào Room ở Thread phụ
+                    // LÆ°u danh sÃ¡ch khÃ³a há»c vÃ o Room á»Ÿ Thread phá»¥
                     new Thread(() -> {
                         try {
                             if (!courses.isEmpty()) {
                                 dao.deleteAllPodCourses();
                                 dao.insertPodCourses(courses);
                             }
-                            // Báo thành công về UI Thread
+                            // BÃ¡o thÃ nh cÃ´ng vá» UI Thread
                             mainHandler.post(callback::onSuccess);
                         } catch (Exception e) {
                             mainHandler.post(() -> callback.onFailure(e));
@@ -210,6 +212,9 @@ public final class FonosRepository {
             favoriteData.put("author", book.author);
             favoriteData.put("type", book.type);
             favoriteData.put("coverImage", book.coverImage);
+            favoriteData.put("audioResName", book.audioResName);
+            putIfNotBlank(favoriteData, "audioUrl", book.audioUrl);
+            putIfNotBlank(favoriteData, "audioStoragePath", book.audioStoragePath);
             favoriteData.put("updatedAt", FieldValue.serverTimestamp());
 
             firestore.collection("users")
@@ -317,5 +322,10 @@ public final class FonosRepository {
                 .document("book_" + bookId)
                 .set(progressData)
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to save listening progress to Firestore", e));
+    }
+    private static void putIfNotBlank(Map<String, Object> data, String key, String value) {
+        if (value != null && !value.trim().isEmpty()) {
+            data.put(key, value);
+        }
     }
 }

@@ -16,9 +16,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.Locale;
 
 import hcmute.com.fonosclone.data.AppDatabase;
+import hcmute.com.fonosclone.data.DownloadedContent;
 import hcmute.com.fonosclone.data.ListeningHistory;
 import hcmute.com.fonosclone.data.ListeningProgress;
 
@@ -29,6 +31,8 @@ public class PlayerActivity extends BaseActivity {
     private String title;
     private String author;
     private String audioResName;
+    private String audioUrl;
+    private String audioStoragePath;
     private String coverImage;
     private int bookId;
     private boolean isPlaying;
@@ -63,6 +67,15 @@ public class PlayerActivity extends BaseActivity {
             String status = intent.getStringExtra(ContentDownloadService.EXTRA_STATUS);
             int progress = intent.getIntExtra(ContentDownloadService.EXTRA_PROGRESS, 0);
             if (ContentDownloadService.STATUS_COMPLETED.equals(status)) {
+                String localAudioPath = intent.getStringExtra(ContentDownloadService.EXTRA_LOCAL_AUDIO_PATH);
+                if (localAudioPath != null && !localAudioPath.trim().isEmpty()) {
+                    File localAudioFile = new File(localAudioPath);
+                    if (localAudioFile.exists()) {
+                        audioResName = localAudioFile.getAbsolutePath();
+                        audioUrl = "";
+                        audioStoragePath = "";
+                    }
+                }
                 downloadButton.setEnabled(false);
                 downloadButton.setText(R.string.downloaded);
             } else if (ContentDownloadService.STATUS_RUNNING.equals(status)) {
@@ -84,6 +97,8 @@ public class PlayerActivity extends BaseActivity {
         title = getIntent().getStringExtra(AudioPlayerService.EXTRA_TITLE);
         author = getIntent().getStringExtra(AudioPlayerService.EXTRA_AUTHOR);
         audioResName = getIntent().getStringExtra(AudioPlayerService.EXTRA_AUDIO_RES);
+        audioUrl = getIntent().getStringExtra(AudioPlayerService.EXTRA_AUDIO_URL);
+        audioStoragePath = getIntent().getStringExtra(AudioPlayerService.EXTRA_AUDIO_STORAGE_PATH);
         bookId = getIntent().getIntExtra(EXTRA_BOOK_ID, 0);
         currentPositionMs = getIntent().getIntExtra(AudioPlayerService.EXTRA_START_POSITION_MS, 0);
         lastSavedPositionMs = currentPositionMs;
@@ -113,7 +128,7 @@ public class PlayerActivity extends BaseActivity {
             // It's a PodCourse/Podcast: Show color and emoji
             coverView.setVisibility(View.GONE);
             emojiView.setVisibility(View.VISIBLE);
-            emojiView.setText(coverEmoji != null ? coverEmoji : "🎓");
+            emojiView.setText(coverEmoji != null ? coverEmoji : "ðŸŽ“");
             coverCard.setCardBackgroundColor(Color.parseColor(coverColor));
         } else {
             // It's a standard Book: Show image cover and reset background to white
@@ -159,7 +174,7 @@ public class PlayerActivity extends BaseActivity {
         downloadButton.setOnClickListener(v -> {
             if (bookId <= 0) return;
             downloadButton.setText(getString(R.string.download_in_progress) + " 0%");
-            ContentDownloadService.startDownload(this, bookId, title);
+            ContentDownloadService.startDownload(this, bookId, title, audioResName, audioUrl, audioStoragePath);
             Toast.makeText(this, R.string.download_started, Toast.LENGTH_SHORT).show();
         });
 
@@ -328,12 +343,21 @@ public class PlayerActivity extends BaseActivity {
         if (bookId <= 0) return;
 
         new Thread(() -> {
-            int downloadedCount = AppDatabase
+            DownloadedContent downloadedContent = AppDatabase
                     .getInstance(getApplicationContext())
                     .fonosDao()
-                    .isBookDownloaded(bookId);
+                    .getDownloadedContent(bookId);
 
-            if (downloadedCount <= 0) return;
+            if (downloadedContent == null) return;
+
+            if (downloadedContent.localAudioPath != null && !downloadedContent.localAudioPath.trim().isEmpty()) {
+                File localAudioFile = new File(downloadedContent.localAudioPath);
+                if (localAudioFile.exists()) {
+                    audioResName = localAudioFile.getAbsolutePath();
+                    audioUrl = "";
+                    audioStoragePath = "";
+                }
+            }
 
             runOnUiThread(() -> {
                 downloadButton.setEnabled(false);

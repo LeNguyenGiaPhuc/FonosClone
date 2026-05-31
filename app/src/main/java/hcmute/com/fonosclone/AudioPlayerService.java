@@ -11,9 +11,13 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import hcmute.com.fonosclone.data.AppDatabase;
 import hcmute.com.fonosclone.data.ListeningProgress;
@@ -27,12 +31,15 @@ public class AudioPlayerService extends Service {
     public static final String EXTRA_TITLE = "extra_title";
     public static final String EXTRA_AUTHOR = "extra_author";
     public static final String EXTRA_AUDIO_RES = "extra_audio_res";
+    public static final String EXTRA_AUDIO_URL = "extra_audio_url";
+    public static final String EXTRA_AUDIO_STORAGE_PATH = "extra_audio_storage_path";
     public static final String EXTRA_BOOK_ID = "extra_book_id";
     public static final String EXTRA_START_POSITION_MS = "extra_start_position_ms";
     public static final String EXTRA_POSITION_MS = "extra_position_ms";
     public static final String EXTRA_DURATION_MS = "extra_duration_ms";
     public static final String EXTRA_IS_PLAYING = "extra_is_playing";
 
+    private static final String TAG = "AudioPlayerService";
     private static final String CHANNEL_ID = "audio_playback";
     private static final int NOTIFICATION_ID = 67;
 
@@ -50,6 +57,7 @@ public class AudioPlayerService extends Service {
     private int currentAudioResId;
     private String currentAudioResName = "";
     private String currentAudioUrl = "";
+    private String currentAudioStoragePath = "";
     private String currentTitle = "";
     private String currentAuthor = "";
     private int currentBookId;
@@ -73,10 +81,15 @@ public class AudioPlayerService extends Service {
             currentTitle = intent.getStringExtra(EXTRA_TITLE);
             currentAuthor = intent.getStringExtra(EXTRA_AUTHOR);
             String audioResName = intent.getStringExtra(EXTRA_AUDIO_RES);
+            String audioUrl = intent.getStringExtra(EXTRA_AUDIO_URL);
+            String audioStoragePath = intent.getStringExtra(EXTRA_AUDIO_STORAGE_PATH);
             currentBookId = intent.getIntExtra(EXTRA_BOOK_ID, currentBookId);
             pendingStartPositionMs = intent.getIntExtra(EXTRA_START_POSITION_MS, 0);
-            currentAudioResName = audioResName;
-            play(audioResName);
+            currentAudioResName = isBlank(audioResName) ? "demo_audio" : audioResName;
+            currentAudioStoragePath = audioStoragePath == null ? "" : audioStoragePath;
+
+            startForeground(NOTIFICATION_ID, buildNotification(false));
+            playBestAvailableSource(audioUrl, audioStoragePath, currentAudioResName);
         } else if (ACTION_PAUSE.equals(action)) {
             pause();
         } else if (ACTION_STOP.equals(action)) {
@@ -93,26 +106,56 @@ public class AudioPlayerService extends Service {
         return null;
     }
 
-    private void play(String audioResName) {
-        if (audioResName == null || audioResName.isEmpty()) {
-            audioResName = "demo_audio";
+    private void playBestAvailableSource(String audioUrl, String audioStoragePath, String fallbackAudioResName) {
+        if (!isBlank(audioUrl)) {
+            play(audioUrl);
+            return;
+        }
+        if (!isBlank(audioStoragePath)) {
+            playFromFirebaseStorage(audioStoragePath, fallbackAudioResName);
+            return;
+        }
+        play(fallbackAudioResName);
+    }
+
+    private void playFromFirebaseStorage(String storagePath, String fallbackAudioResName) {
+        try {
+            StorageReference reference = storagePath.startsWith("gs://")
+                    ? FirebaseStorage.getInstance().getReferenceFromUrl(storagePath)
+                    : FirebaseStorage.getInstance().getReference().child(storagePath);
+            reference.getDownloadUrl()
+                    .addOnSuccessListener(uri -> play(uri.toString()))
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Failed to resolve Firebase Storage audio. Falling back to raw resource.", e);
+                        play(fallbackAudioResName);
+                    });
+        } catch (Exception e) {
+            Log.e(TAG, "Invalid Firebase Storage audio path. Falling back to raw resource.", e);
+            play(fallbackAudioResName);
+        }
+    }
+
+    private void play(String audioSource) {
+        if (isBlank(audioSource)) {
+            audioSource = "demo_audio";
         }
 
-        boolean isUrl = audioResName.startsWith("http://") || audioResName.startsWith("https://");
+        boolean isUrl = audioSource.startsWith("http://") || audioSource.startsWith("https://");
+        boolean isFile = audioSource.startsWith("file://") || audioSource.startsWith("/");
 
-        if (isUrl) {
-            // Case 1: Playing a Cloud Streaming URL (e.g. Firebase Storage)
-            if (mediaPlayer == null || !currentAudioUrl.equals(audioResName)) {
+        if (isUrl || isFile) {
+            String dataSource = audioSource.startsWith("file://") ? audioSource.substring("file://".length()) : audioSource;
+            if (mediaPlayer == null || !currentAudioUrl.equals(dataSource)) {
                 releasePlayer();
-                currentAudioUrl = audioResName;
-                currentAudioResName = audioResName;
+                currentAudioUrl = dataSource;
+                currentAudioResName = audioSource;
                 try {
                     mediaPlayer = new MediaPlayer();
-                    mediaPlayer.setDataSource(audioResName);
+                    mediaPlayer.setDataSource(dataSource);
                     mediaPlayer.setOnPreparedListener(mp -> {
                         if (mediaPlayer != null) {
-                            mediaPlayer.start();
                             seekToPendingStartPosition();
+                            mediaPlayer.start();
                             progressHandler.removeCallbacks(progressRunnable);
                             progressHandler.post(progressRunnable);
                             startForeground(NOTIFICATION_ID, buildNotification(true));
@@ -122,47 +165,50 @@ public class AudioPlayerService extends Service {
                         sendProgressUpdate();
                         stopForeground(false);
                     });
-                    mediaPlayer.prepareAsync(); // Prepare asynchronously to keep the UI fluid!
+                    mediaPlayer.prepareAsync();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "Unable to play audio source. Falling back to demo_audio.", e);
+                    playLocalRaw("demo_audio");
                 }
             } else {
-                if (!mediaPlayer.isPlaying()) {
-                    mediaPlayer.start();
-                }
-                progressHandler.removeCallbacks(progressRunnable);
-                progressHandler.post(progressRunnable);
-                startForeground(NOTIFICATION_ID, buildNotification(true));
+                resumeExistingPlayer();
             }
-        } else {
-            // Case 2: Playing a Local Raw Resource
-            int audioResId = getResources().getIdentifier(audioResName, "raw", getPackageName());
-            if (audioResId == 0) {
-                audioResId = R.raw.demo_audio;
-                currentAudioResName = "demo_audio";
-            }
-
-            if (mediaPlayer == null || currentAudioResId != audioResId || !currentAudioUrl.isEmpty()) {
-                releasePlayer();
-                currentAudioResId = audioResId;
-                currentAudioUrl = ""; // clear URL
-                mediaPlayer = MediaPlayer.create(this, audioResId);
-                mediaPlayer.setOnCompletionListener(mp -> {
-                    sendProgressUpdate();
-                    persistProgress(0, mediaPlayer != null ? mediaPlayer.getDuration() : 0, false);
-                    stopForeground(false);
-                });
-            }
-
-            seekToPendingStartPosition();
-            if (!mediaPlayer.isPlaying()) {
-                mediaPlayer.start();
-            }
-
-            progressHandler.removeCallbacks(progressRunnable);
-            progressHandler.post(progressRunnable);
-            startForeground(NOTIFICATION_ID, buildNotification(true));
+            return;
         }
+
+        playLocalRaw(audioSource);
+    }
+
+    private void playLocalRaw(String audioResName) {
+        int audioResId = getResources().getIdentifier(audioResName, "raw", getPackageName());
+        if (audioResId == 0) {
+            audioResId = R.raw.demo_audio;
+            currentAudioResName = "demo_audio";
+        }
+
+        if (mediaPlayer == null || currentAudioResId != audioResId || !currentAudioUrl.isEmpty()) {
+            releasePlayer();
+            currentAudioResId = audioResId;
+            currentAudioUrl = "";
+            mediaPlayer = MediaPlayer.create(this, audioResId);
+            mediaPlayer.setOnCompletionListener(mp -> {
+                sendProgressUpdate();
+                persistProgress(0, mediaPlayer != null ? mediaPlayer.getDuration() : 0, false);
+                stopForeground(false);
+            });
+        }
+
+        seekToPendingStartPosition();
+        resumeExistingPlayer();
+    }
+
+    private void resumeExistingPlayer() {
+        if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
+            mediaPlayer.start();
+        }
+        progressHandler.removeCallbacks(progressRunnable);
+        progressHandler.post(progressRunnable);
+        startForeground(NOTIFICATION_ID, buildNotification(true));
     }
 
     private void pause() {
@@ -226,6 +272,8 @@ public class AudioPlayerService extends Service {
         toggleIntent.putExtra(EXTRA_TITLE, currentTitle);
         toggleIntent.putExtra(EXTRA_AUTHOR, currentAuthor);
         toggleIntent.putExtra(EXTRA_AUDIO_RES, currentAudioResName);
+        toggleIntent.putExtra(EXTRA_AUDIO_URL, currentAudioUrl);
+        toggleIntent.putExtra(EXTRA_AUDIO_STORAGE_PATH, currentAudioStoragePath);
         toggleIntent.putExtra(EXTRA_BOOK_ID, currentBookId);
         PendingIntent togglePendingIntent = PendingIntent.getService(
                 this,
@@ -326,5 +374,9 @@ public class AudioPlayerService extends Service {
                         System.currentTimeMillis()
                 ))
         ).start();
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

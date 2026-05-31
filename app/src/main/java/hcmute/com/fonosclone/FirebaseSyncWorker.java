@@ -75,6 +75,9 @@ public class FirebaseSyncWorker extends Worker {
             data.put("author", book.author);
             data.put("type", book.type);
             data.put("coverImage", book.coverImage);
+            data.put("audioResName", book.audioResName);
+            putIfNotBlank(data, "audioUrl", book.audioUrl);
+            putIfNotBlank(data, "audioStoragePath", book.audioStoragePath);
             data.put("updatedAt", FieldValue.serverTimestamp());
             batch.set(ref, data);
             writes++;
@@ -122,11 +125,21 @@ public class FirebaseSyncWorker extends Worker {
             data.put("title", book != null ? book.title : "");
             data.put("author", book != null ? book.author : "");
             data.put("coverImage", book != null ? book.coverImage : "");
+            data.put("audioResName", book != null ? book.audioResName : "");
+            putIfNotBlank(data, "audioUrl", book != null ? book.audioUrl : "");
+            putIfNotBlank(data, "audioStoragePath", book != null ? book.audioStoragePath : "");
+            putIfNotBlank(data, "remoteAudioSource", download.remoteAudioSource);
+            data.put("hasLocalFile", download.localAudioPath != null && !download.localAudioPath.trim().isEmpty());
             data.put("downloadedAt", download.downloadedAt);
             data.put("updatedAt", FieldValue.serverTimestamp());
             batch.set(ref, data);
             writes++;
         }
         return writes;
+    }
+    private static void putIfNotBlank(Map<String, Object> data, String key, String value) {
+        if (value != null && !value.trim().isEmpty()) {
+            data.put(key, value);
+        }
     }
 }

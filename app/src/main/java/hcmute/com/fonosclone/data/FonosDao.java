@@ -74,6 +74,9 @@ public interface FonosDao {
     @Query("SELECT * FROM downloaded_content")
     List<DownloadedContent> getDownloadedContents();
 
+    @Query("SELECT * FROM downloaded_content WHERE bookId = :bookId LIMIT 1")
+    DownloadedContent getDownloadedContent(int bookId);
+
     @Query("SELECT * FROM pod_courses")
     List<PodCourse> getPodCourses();
 
