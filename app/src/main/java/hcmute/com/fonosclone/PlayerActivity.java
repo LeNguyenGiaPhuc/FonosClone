@@ -301,6 +301,7 @@ public class PlayerActivity extends BaseActivity {
                         System.currentTimeMillis()
                 ))
         ).start();
+        SyncScheduler.enqueueUserSync(this);
     }
 
     private void loadSavedProgress() {

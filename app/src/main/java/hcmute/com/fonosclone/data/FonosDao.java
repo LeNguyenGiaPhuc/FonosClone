@@ -38,6 +38,9 @@ public interface FonosDao {
     @Query("SELECT * FROM listening_progress ORDER BY updatedAt DESC LIMIT 1")
     ListeningProgress getLatestListeningProgress();
 
+    @Query("SELECT * FROM listening_progress")
+    List<ListeningProgress> getAllListeningProgress();
+
     @Query("SELECT COUNT(*) FROM books")
     int countBooks();
 
@@ -67,6 +70,9 @@ public interface FonosDao {
 
     @Query("SELECT COUNT(*) FROM downloaded_content WHERE bookId = :bookId")
     int isBookDownloaded(int bookId);
+
+    @Query("SELECT * FROM downloaded_content")
+    List<DownloadedContent> getDownloadedContents();
 
     @Query("SELECT * FROM pod_courses")
     List<PodCourse> getPodCourses();

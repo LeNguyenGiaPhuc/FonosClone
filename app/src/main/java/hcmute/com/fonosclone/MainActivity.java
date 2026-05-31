@@ -43,6 +43,7 @@ public class MainActivity extends BaseActivity {
         AppDatabase db = AppDatabase.getInstance(this);
         appDatabase = db;
         FonosRepository repository = new FonosRepository(this);
+        SyncScheduler.enqueueUserSync(this);
 
         // 1. Tự động kiểm tra và đồng bộ ngược dữ liệu lên Firestore có chẩn đoán lỗi bằng Toast
         seedFirestoreIfNecessary();
