@@ -25,6 +25,7 @@ public class SearchActivity extends BaseActivity {
     private LinearLayout searchBookListContainer;
     private TextView tvResultsTitle;
     private FonosDao dao;
+    private FonosRepository repository;
     
     // Cờ chống vòng lặp trigger ngược từ TextWatcher khi thay đổi text bằng code
     private boolean isProgrammaticChange = false;
@@ -39,6 +40,7 @@ public class SearchActivity extends BaseActivity {
         setupUserMenu();
 
         dao = AppDatabase.getInstance(getApplicationContext()).fonosDao();
+        repository = new FonosRepository(this);
 
         // Ánh xạ views
         etSearch = findViewById(R.id.etSearch);
@@ -156,7 +158,7 @@ public class SearchActivity extends BaseActivity {
                     this,
                     searchBookListContainer,
                     books,
-                    (book, newFavoriteValue) -> new Thread(() -> dao.setFavorite(book.id, newFavoriteValue)).start()
+                    repository::setFavoriteForCurrentUser
             );
         }
     }

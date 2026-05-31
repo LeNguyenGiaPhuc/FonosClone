@@ -23,14 +23,29 @@ public interface FonosDao {
     @Insert
     void insertListeningHistory(ListeningHistory history);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void upsertListeningProgress(ListeningProgress progress);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void upsertDownloadedContent(DownloadedContent content);
+
     @Query("SELECT COALESCE(SUM(listenedSeconds), 0) FROM listening_history")
     int getTotalListenedSeconds();
+
+    @Query("SELECT * FROM listening_progress WHERE bookId = :bookId LIMIT 1")
+    ListeningProgress getListeningProgress(int bookId);
+
+    @Query("SELECT * FROM listening_progress ORDER BY updatedAt DESC LIMIT 1")
+    ListeningProgress getLatestListeningProgress();
 
     @Query("SELECT COUNT(*) FROM books")
     int countBooks();
 
     @Query("UPDATE books SET isFavorite = :isFavorite WHERE id = :bookId")
     void setFavorite(int bookId, boolean isFavorite);
+
+    @Query("UPDATE books SET isFavorite = 0")
+    void clearBookFavorites();
 
     @Query("SELECT * FROM books WHERE type = :type")
     List<Book> getBooksByType(String type);
@@ -46,6 +61,12 @@ public interface FonosDao {
 
     @Query("SELECT * FROM books WHERE isFavorite = 1")
     List<Book> getFavoriteBooks();
+
+    @Query("SELECT books.* FROM books INNER JOIN downloaded_content ON books.id = downloaded_content.bookId ORDER BY downloaded_content.downloadedAt DESC")
+    List<Book> getDownloadedBooks();
+
+    @Query("SELECT COUNT(*) FROM downloaded_content WHERE bookId = :bookId")
+    int isBookDownloaded(int bookId);
 
     @Query("SELECT * FROM pod_courses")
     List<PodCourse> getPodCourses();

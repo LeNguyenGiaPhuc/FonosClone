@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,16 +14,21 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import hcmute.com.fonosclone.data.AppDatabase;
 import hcmute.com.fonosclone.data.Book;
 import hcmute.com.fonosclone.data.FonosDao;
+import hcmute.com.fonosclone.data.ListeningProgress;
 import hcmute.com.fonosclone.data.PodCourse;
 import hcmute.com.fonosclone.data.SeedData;
 
 public class MainActivity extends BaseActivity {
     private final List<Book> currentAudiobooks = new ArrayList<>();
+    private Book continueBook;
+    private int continuePositionMs;
+    private AppDatabase appDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +41,7 @@ public class MainActivity extends BaseActivity {
         setupUserMenu();
 
         AppDatabase db = AppDatabase.getInstance(this);
+        appDatabase = db;
         FonosRepository repository = new FonosRepository(this);
 
         // 1. Tự động kiểm tra và đồng bộ ngược dữ liệu lên Firestore có chẩn đoán lỗi bằng Toast
@@ -48,7 +55,29 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onSuccess() {
                 // Đồng bộ xong -> Nạp lại giao diện với sách mới nhất từ mây
-                loadLocalBooks(db);
+                repository.syncFavoritesForCurrentUser(new FonosRepository.SyncCallback() {
+                    @Override
+                    public void onSuccess() {
+                        repository.syncListeningProgressForCurrentUser(new FonosRepository.SyncCallback() {
+                            @Override
+                            public void onSuccess() {
+                                loadLocalBooks(db);
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                e.printStackTrace();
+                                loadLocalBooks(db);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        e.printStackTrace();
+                        loadLocalBooks(db);
+                    }
+                });
             }
 
             @Override
@@ -59,6 +88,19 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (appDatabase == null) return;
+
+        View rootView = findViewById(R.id.main);
+        if (rootView != null) {
+            rootView.postDelayed(() -> loadLocalBooks(appDatabase), 250);
+        } else {
+            loadLocalBooks(appDatabase);
+        }
+    }
+
     private void loadLocalBooks(AppDatabase db) {
         new Thread(() -> {
             FonosDao dao = db.fonosDao();
@@ -67,13 +109,20 @@ public class MainActivity extends BaseActivity {
             }
 
             List<Book> audiobooks = dao.getBooksByType("AUDIOBOOK");
+            ListeningProgress latestProgress = dao.getLatestListeningProgress();
+            Book latestBook = latestProgress != null ? dao.getBookById(latestProgress.bookId) : null;
+            if (latestBook == null && !audiobooks.isEmpty()) {
+                latestBook = audiobooks.get(0);
+            }
+            final Book finalLatestBook = latestBook;
+            final ListeningProgress finalLatestProgress = latestProgress;
 
             runOnUiThread(() -> {
                 currentAudiobooks.clear();
                 currentAudiobooks.addAll(audiobooks);
+                bindContinueListening(finalLatestBook, finalLatestProgress);
 
                 if (audiobooks.size() > 0) {
-                    bindCover(audiobooks.get(0), R.id.ivCover1);
                     bindBook(audiobooks.get(0), R.id.ivGridCover1, R.id.tvTitle1, R.id.tvAuthor1);
                 }
 
@@ -87,7 +136,6 @@ public class MainActivity extends BaseActivity {
                     bindBook(audiobooks.get(2), R.id.ivGridCover3, R.id.tvTitle3, R.id.tvAuthor3);
                 }
 
-                setupBookClick(R.id.ivCover1, 0);
                 setupBookClick(R.id.ivGridCover1, 0);
                 setupBookClick(R.id.ivCover2, 1);
                 setupBookClick(R.id.ivGridCover2, 1);
@@ -224,13 +272,67 @@ public class MainActivity extends BaseActivity {
     }
 
     private void openPlayer(Book book) {
+        openPlayer(book, 0);
+    }
+
+    private void openPlayer(Book book, int startPositionMs) {
         Intent intent = new Intent(this, PlayerActivity.class);
         intent.putExtra(AudioPlayerService.EXTRA_TITLE, book.title);
         intent.putExtra(AudioPlayerService.EXTRA_AUTHOR, book.author);
         intent.putExtra(AudioPlayerService.EXTRA_AUDIO_RES, book.audioResName);
         intent.putExtra(PlayerActivity.EXTRA_BOOK_ID, book.id);
         intent.putExtra("cover_image", book.coverImage);
+        intent.putExtra(AudioPlayerService.EXTRA_START_POSITION_MS, startPositionMs);
         startActivity(intent);
+    }
+
+    private void bindContinueListening(Book book, ListeningProgress progress) {
+        if (book == null) return;
+
+        continueBook = book;
+        continuePositionMs = progress != null ? progress.positionMs : 0;
+
+        bindCover(book, R.id.ivCover1);
+
+        TextView labelView = findViewById(R.id.tvContinueLabel);
+        TextView titleView = findViewById(R.id.tvContinueTitle);
+        TextView metaView = findViewById(R.id.tvContinueMeta);
+        TextView timeView = findViewById(R.id.tvContinueTime);
+
+        if (labelView != null) {
+            labelView.setText(progress != null && progress.positionMs > 0
+                    ? R.string.home_continue
+                    : R.string.home_today_pick);
+        }
+        if (titleView != null) {
+            titleView.setText(book.title);
+        }
+        if (metaView != null) {
+            String category = book.category != null ? book.category : book.type;
+            metaView.setText(book.author + " · " + category);
+        }
+        if (timeView != null) {
+            if (progress != null && progress.durationMs > 0) {
+                timeView.setText(formatPlayerTime(progress.positionMs) + " / " + formatPlayerTime(progress.durationMs));
+            } else {
+                timeView.setText(R.string.home_minutes);
+            }
+        }
+
+        View card = findViewById(R.id.continueListeningCard);
+        View play = findViewById(R.id.btnContinuePlay);
+        View cover = findViewById(R.id.ivCover1);
+        View.OnClickListener listener = v -> openPlayer(continueBook, continuePositionMs);
+        if (card != null) card.setOnClickListener(listener);
+        if (play != null) play.setOnClickListener(listener);
+        if (cover != null) cover.setOnClickListener(listener);
+    }
+
+    private String formatPlayerTime(int millis) {
+        int totalSeconds = Math.max(0, millis / 1000);
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format(Locale.US, "%02d:%02d", minutes, seconds);
     }
 
     private void bindBook(Book book, int coverViewId, int titleViewId, int authorViewId) {

@@ -76,6 +76,9 @@
     <string name="player_time_format">%1$s / %2$s</string>
     <string name="download_channel_name">Content downloads</string>
     <string name="download_default_title">Audio content</string>
+    <string name="download">Download</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="download_started">Download started</string>
     <string name="download_in_progress">Downloading</string>
     <string name="download_completed">Download complete</string>
     <string name="best_seller">BEST SELLER</string>
@@ -83,6 +86,11 @@
     <!-- Recommended section -->
     <string name="recommended_for_you">12 Audiobooks For You</string>
     <string name="recommended_subtitle">Perfect for beginners — tap to listen</string>
+    <string name="home_continue">Continue listening</string>
+    <string name="home_today_pick">Today pick</string>
+    <string name="home_minutes">15 min</string>
+    <string name="home_trending">Trending now</string>
+    <string name="home_fresh_release">Fresh releases</string>
     <string name="recommended_ebooks">12 Ebooks For You</string>
     <string name="recommended_ebooks_subtitle">Read anywhere, anytime — tap to open</string>
     <string name="recommended_summaries">12 Summaries For You</string>

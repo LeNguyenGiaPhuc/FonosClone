@@ -20,6 +20,7 @@ public class LibraryActivity extends BaseActivity {
     private static final int TAB_FAVORITE = 2;
 
     private int activeTab = TAB_DOWNLOADED;
+    private FonosRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,15 +31,15 @@ public class LibraryActivity extends BaseActivity {
         setupBottomNavigation(NAV_LIBRARY);
         setupUserMenu();
 
+        repository = new FonosRepository(this);
         setupTabs();
-        loadTabData();
+        syncFavoritesAndLoad();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Load lại dữ liệu mỗi khi quay lại màn hình thư viện (để cập nhật trạng thái Yêu thích mới nhất)
-        loadTabData();
+        syncFavoritesAndLoad();
     }
 
     private void setupTabs() {
@@ -61,12 +62,10 @@ public class LibraryActivity extends BaseActivity {
         if (activeTab == tabIndex) return;
         activeTab = tabIndex;
 
-        // Cập nhật giao diện tabs
         updateTabUI(R.id.tvTabDownloaded, R.id.indicatorDownloaded, activeTab == TAB_DOWNLOADED);
         updateTabUI(R.id.tvTabPurchased, R.id.indicatorPurchased, activeTab == TAB_PURCHASED);
         updateTabUI(R.id.tvTabFavorite, R.id.indicatorFavorite, activeTab == TAB_FAVORITE);
 
-        // Nạp lại dữ liệu tương ứng
         loadTabData();
     }
 
@@ -83,6 +82,21 @@ public class LibraryActivity extends BaseActivity {
         }
     }
 
+    private void syncFavoritesAndLoad() {
+        repository.syncFavoritesForCurrentUser(new FonosRepository.SyncCallback() {
+            @Override
+            public void onSuccess() {
+                loadTabData();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                loadTabData();
+            }
+        });
+    }
+
     private void loadTabData() {
         LinearLayout bookListContainer = findViewById(R.id.bookListContainer);
         LinearLayout emptyStateContainer = findViewById(R.id.emptyStateContainer);
@@ -93,15 +107,11 @@ public class LibraryActivity extends BaseActivity {
             FonosDao dao = db.fonosDao();
             List<Book> books = new ArrayList<>();
 
-            // Truy vấn dữ liệu theo tab tương ứng
             if (activeTab == TAB_DOWNLOADED) {
-                // Lấy sách nói (AUDIOBOOK) làm danh sách sách tải xuống demo
-                books = dao.getBooksByType("AUDIOBOOK");
+                books = dao.getDownloadedBooks();
             } else if (activeTab == TAB_PURCHASED) {
-                // Lấy sách điện tử (EBOOK) làm danh sách sách đã mua demo
                 books = dao.getBooksByType("EBOOK");
             } else if (activeTab == TAB_FAVORITE) {
-                // Lấy sách được người dùng đánh dấu là yêu thích thực tế từ database
                 books = dao.getFavoriteBooks();
             }
 
@@ -111,22 +121,35 @@ public class LibraryActivity extends BaseActivity {
                 if (finalBooks == null || finalBooks.isEmpty()) {
                     if (emptyStateContainer != null) emptyStateContainer.setVisibility(View.VISIBLE);
                     if (scrollViewContainer != null) scrollViewContainer.setVisibility(View.GONE);
-                } else {
-                    if (emptyStateContainer != null) emptyStateContainer.setVisibility(View.GONE);
-                    if (scrollViewContainer != null) scrollViewContainer.setVisibility(View.VISIBLE);
+                    return;
+                }
 
-                    if (bookListContainer != null) {
-                        BookListRenderer.render(
-                                this,
-                                bookListContainer,
-                                finalBooks,
-                                (book, newFavoriteValue) -> new Thread(() -> {
-                                    dao.setFavorite(book.id, newFavoriteValue);
-                                    // Sau khi bỏ/thêm yêu thích ở màn hình Thư viện, nạp lại tab ngay lập tức
-                                    runOnUiThread(this::loadTabData);
-                                }).start()
-                        );
-                    }
+                if (emptyStateContainer != null) emptyStateContainer.setVisibility(View.GONE);
+                if (scrollViewContainer != null) scrollViewContainer.setVisibility(View.VISIBLE);
+
+                if (bookListContainer != null) {
+                    BookListRenderer.render(
+                            this,
+                            bookListContainer,
+                            finalBooks,
+                            (book, newFavoriteValue) -> repository.setFavoriteForCurrentUser(
+                                    book,
+                                    newFavoriteValue,
+                                    new FonosRepository.SyncCallback() {
+                                        @Override
+                                        public void onSuccess() {
+                                            if (activeTab == TAB_FAVORITE) {
+                                                loadTabData();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                            )
+                    );
                 }
             });
         }).start();

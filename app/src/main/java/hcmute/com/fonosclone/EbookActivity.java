@@ -27,6 +27,7 @@ public class EbookActivity extends BaseActivity {
 
     private void loadBooks() {
         LinearLayout container = findViewById(R.id.bookListContainer);
+        FonosRepository repository = new FonosRepository(this);
         new Thread(() -> {
             FonosDao dao = AppDatabase.getInstance(getApplicationContext()).fonosDao();
             SeedData.insertSampleData(dao);
@@ -36,11 +37,7 @@ public class EbookActivity extends BaseActivity {
                     this,
                     container,
                     books,
-                    (book, newFavoriteValue) -> new Thread(() ->
-                            AppDatabase.getInstance(getApplicationContext())
-                                    .fonosDao()
-                                    .setFavorite(book.id, newFavoriteValue)
-                    ).start()
+                    repository::setFavoriteForCurrentUser
             ));
         }).start();
     }

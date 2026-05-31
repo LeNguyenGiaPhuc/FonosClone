@@ -15,6 +15,9 @@ import android.os.Looper;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import hcmute.com.fonosclone.data.AppDatabase;
+import hcmute.com.fonosclone.data.DownloadedContent;
+
 public class ContentDownloadService extends Service {
 
     public static final String ACTION_START_DOWNLOAD = "hcmute.com.fonosclone.action.START_DOWNLOAD";
@@ -22,6 +25,7 @@ public class ContentDownloadService extends Service {
     public static final String ACTION_DOWNLOAD_PROGRESS = "hcmute.com.fonosclone.action.DOWNLOAD_PROGRESS";
 
     public static final String EXTRA_CONTENT_ID = "extra_content_id";
+    public static final String EXTRA_BOOK_ID = "extra_book_id";
     public static final String EXTRA_TITLE = "extra_title";
     public static final String EXTRA_PROGRESS = "extra_progress";
     public static final String EXTRA_STATUS = "extra_status";
@@ -39,6 +43,7 @@ public class ContentDownloadService extends Service {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private String currentContentId = "";
     private String currentTitle = "";
+    private int currentBookId;
     private int progress;
 
     private final Runnable progressRunnable = new Runnable() {
@@ -47,6 +52,7 @@ public class ContentDownloadService extends Service {
             progress = Math.min(PROGRESS_MAX, progress + PROGRESS_STEP);
 
             if (progress >= PROGRESS_MAX) {
+                markContentDownloaded();
                 sendProgressBroadcast(STATUS_COMPLETED);
                 showCompletedNotification();
                 stopForeground(false);
@@ -64,6 +70,20 @@ public class ContentDownloadService extends Service {
         Intent intent = new Intent(context, ContentDownloadService.class);
         intent.setAction(ACTION_START_DOWNLOAD);
         intent.putExtra(EXTRA_CONTENT_ID, contentId);
+        intent.putExtra(EXTRA_TITLE, title);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
+    }
+
+    public static void startDownload(Context context, int bookId, String title) {
+        Intent intent = new Intent(context, ContentDownloadService.class);
+        intent.setAction(ACTION_START_DOWNLOAD);
+        intent.putExtra(EXTRA_BOOK_ID, bookId);
+        intent.putExtra(EXTRA_CONTENT_ID, "book_" + bookId);
         intent.putExtra(EXTRA_TITLE, title);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -92,6 +112,7 @@ public class ContentDownloadService extends Service {
         }
 
         if (ACTION_START_DOWNLOAD.equals(intent.getAction())) {
+            currentBookId = intent.getIntExtra(EXTRA_BOOK_ID, 0);
             currentContentId = intent.getStringExtra(EXTRA_CONTENT_ID);
             currentTitle = intent.getStringExtra(EXTRA_TITLE);
             if (currentTitle == null || currentTitle.trim().isEmpty()) {
@@ -181,6 +202,7 @@ public class ContentDownloadService extends Service {
         Intent intent = new Intent(ACTION_DOWNLOAD_PROGRESS);
         intent.setPackage(getPackageName());
         intent.putExtra(EXTRA_CONTENT_ID, currentContentId);
+        intent.putExtra(EXTRA_BOOK_ID, currentBookId);
         intent.putExtra(EXTRA_TITLE, currentTitle);
         intent.putExtra(EXTRA_PROGRESS, progress);
         intent.putExtra(EXTRA_STATUS, status);
@@ -205,5 +227,17 @@ public class ContentDownloadService extends Service {
     public void onDestroy() {
         handler.removeCallbacks(progressRunnable);
         super.onDestroy();
+    }
+
+    private void markContentDownloaded() {
+        if (currentBookId <= 0) {
+            return;
+        }
+
+        new Thread(() -> AppDatabase
+                .getInstance(getApplicationContext())
+                .fonosDao()
+                .upsertDownloadedContent(new DownloadedContent(currentBookId, System.currentTimeMillis()))
+        ).start();
     }
 }

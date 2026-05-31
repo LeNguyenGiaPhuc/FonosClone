@@ -15,6 +15,9 @@ import android.os.Looper;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import hcmute.com.fonosclone.data.AppDatabase;
+import hcmute.com.fonosclone.data.ListeningProgress;
+
 public class AudioPlayerService extends Service {
 
     public static final String ACTION_PLAY = "hcmute.com.fonosclone.action.PLAY";
@@ -24,6 +27,8 @@ public class AudioPlayerService extends Service {
     public static final String EXTRA_TITLE = "extra_title";
     public static final String EXTRA_AUTHOR = "extra_author";
     public static final String EXTRA_AUDIO_RES = "extra_audio_res";
+    public static final String EXTRA_BOOK_ID = "extra_book_id";
+    public static final String EXTRA_START_POSITION_MS = "extra_start_position_ms";
     public static final String EXTRA_POSITION_MS = "extra_position_ms";
     public static final String EXTRA_DURATION_MS = "extra_duration_ms";
     public static final String EXTRA_IS_PLAYING = "extra_is_playing";
@@ -47,6 +52,9 @@ public class AudioPlayerService extends Service {
     private String currentAudioUrl = "";
     private String currentTitle = "";
     private String currentAuthor = "";
+    private int currentBookId;
+    private int pendingStartPositionMs;
+    private int lastPersistedPositionMs;
 
     @Override
     public void onCreate() {
@@ -65,6 +73,8 @@ public class AudioPlayerService extends Service {
             currentTitle = intent.getStringExtra(EXTRA_TITLE);
             currentAuthor = intent.getStringExtra(EXTRA_AUTHOR);
             String audioResName = intent.getStringExtra(EXTRA_AUDIO_RES);
+            currentBookId = intent.getIntExtra(EXTRA_BOOK_ID, currentBookId);
+            pendingStartPositionMs = intent.getIntExtra(EXTRA_START_POSITION_MS, 0);
             currentAudioResName = audioResName;
             play(audioResName);
         } else if (ACTION_PAUSE.equals(action)) {
@@ -102,6 +112,7 @@ public class AudioPlayerService extends Service {
                     mediaPlayer.setOnPreparedListener(mp -> {
                         if (mediaPlayer != null) {
                             mediaPlayer.start();
+                            seekToPendingStartPosition();
                             progressHandler.removeCallbacks(progressRunnable);
                             progressHandler.post(progressRunnable);
                             startForeground(NOTIFICATION_ID, buildNotification(true));
@@ -138,10 +149,12 @@ public class AudioPlayerService extends Service {
                 mediaPlayer = MediaPlayer.create(this, audioResId);
                 mediaPlayer.setOnCompletionListener(mp -> {
                     sendProgressUpdate();
+                    persistProgress(0, mediaPlayer != null ? mediaPlayer.getDuration() : 0, false);
                     stopForeground(false);
                 });
             }
 
+            seekToPendingStartPosition();
             if (!mediaPlayer.isPlaying()) {
                 mediaPlayer.start();
             }
@@ -191,6 +204,8 @@ public class AudioPlayerService extends Service {
             isPlaying = mediaPlayer.isPlaying();
         }
 
+        persistProgress(position, duration, isPlaying);
+
         intent.putExtra(EXTRA_POSITION_MS, position);
         intent.putExtra(EXTRA_DURATION_MS, duration);
         intent.putExtra(EXTRA_IS_PLAYING, isPlaying);
@@ -211,6 +226,7 @@ public class AudioPlayerService extends Service {
         toggleIntent.putExtra(EXTRA_TITLE, currentTitle);
         toggleIntent.putExtra(EXTRA_AUTHOR, currentAuthor);
         toggleIntent.putExtra(EXTRA_AUDIO_RES, currentAudioResName);
+        toggleIntent.putExtra(EXTRA_BOOK_ID, currentBookId);
         PendingIntent togglePendingIntent = PendingIntent.getService(
                 this,
                 1,
@@ -266,7 +282,49 @@ public class AudioPlayerService extends Service {
     @Override
     public void onDestroy() {
         progressHandler.removeCallbacks(progressRunnable);
+        sendProgressUpdate();
         releasePlayer();
         super.onDestroy();
+    }
+
+    private void seekToPendingStartPosition() {
+        if (mediaPlayer == null || pendingStartPositionMs <= 0) {
+            return;
+        }
+
+        int duration = mediaPlayer.getDuration();
+        if (duration > 0 && pendingStartPositionMs < duration - 1000) {
+            mediaPlayer.seekTo(pendingStartPositionMs);
+            lastPersistedPositionMs = pendingStartPositionMs;
+        }
+        pendingStartPositionMs = 0;
+    }
+
+    private void persistProgress(int positionMs, int durationMs, boolean isPlaying) {
+        if (currentBookId <= 0 || durationMs <= 0) {
+            return;
+        }
+
+        if (positionMs >= durationMs - 1000) {
+            positionMs = 0;
+        }
+
+        if (isPlaying && Math.abs(positionMs - lastPersistedPositionMs) < 2000) {
+            return;
+        }
+
+        lastPersistedPositionMs = positionMs;
+        int finalPositionMs = Math.max(0, positionMs);
+        int finalDurationMs = Math.max(0, durationMs);
+        new Thread(() -> AppDatabase
+                .getInstance(getApplicationContext())
+                .fonosDao()
+                .upsertListeningProgress(new ListeningProgress(
+                        currentBookId,
+                        finalPositionMs,
+                        finalDurationMs,
+                        System.currentTimeMillis()
+                ))
+        ).start();
     }
 }

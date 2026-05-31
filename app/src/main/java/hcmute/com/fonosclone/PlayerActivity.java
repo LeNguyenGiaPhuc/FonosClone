@@ -14,11 +14,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Locale;
 
 import hcmute.com.fonosclone.data.AppDatabase;
 import hcmute.com.fonosclone.data.ListeningHistory;
+import hcmute.com.fonosclone.data.ListeningProgress;
 
 public class PlayerActivity extends BaseActivity {
 
@@ -27,6 +29,7 @@ public class PlayerActivity extends BaseActivity {
     private String title;
     private String author;
     private String audioResName;
+    private String coverImage;
     private int bookId;
     private boolean isPlaying;
     private int currentPositionMs;
@@ -35,6 +38,8 @@ public class PlayerActivity extends BaseActivity {
     private SeekBar progressBar;
     private TextView timeView;
     private Button playPauseButton;
+    private Button downloadButton;
+    private FonosRepository repository;
 
     private final BroadcastReceiver progressReceiver = new BroadcastReceiver() {
         @Override
@@ -45,6 +50,27 @@ public class PlayerActivity extends BaseActivity {
             currentDurationMs = intent.getIntExtra(AudioPlayerService.EXTRA_DURATION_MS, 0);
             isPlaying = intent.getBooleanExtra(AudioPlayerService.EXTRA_IS_PLAYING, false);
             updateProgressUi();
+        }
+    };
+
+    private final BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!ContentDownloadService.ACTION_DOWNLOAD_PROGRESS.equals(intent.getAction())) return;
+            int downloadedBookId = intent.getIntExtra(ContentDownloadService.EXTRA_BOOK_ID, 0);
+            if (downloadedBookId != bookId) return;
+
+            String status = intent.getStringExtra(ContentDownloadService.EXTRA_STATUS);
+            int progress = intent.getIntExtra(ContentDownloadService.EXTRA_PROGRESS, 0);
+            if (ContentDownloadService.STATUS_COMPLETED.equals(status)) {
+                downloadButton.setEnabled(false);
+                downloadButton.setText(R.string.downloaded);
+            } else if (ContentDownloadService.STATUS_RUNNING.equals(status)) {
+                downloadButton.setText(getString(R.string.download_in_progress) + " " + progress + "%");
+            } else if (ContentDownloadService.STATUS_CANCELLED.equals(status)) {
+                downloadButton.setEnabled(true);
+                downloadButton.setText(R.string.download);
+            }
         }
     };
 
@@ -59,9 +85,12 @@ public class PlayerActivity extends BaseActivity {
         author = getIntent().getStringExtra(AudioPlayerService.EXTRA_AUTHOR);
         audioResName = getIntent().getStringExtra(AudioPlayerService.EXTRA_AUDIO_RES);
         bookId = getIntent().getIntExtra(EXTRA_BOOK_ID, 0);
-        String coverImage = getIntent().getStringExtra("cover_image");
+        currentPositionMs = getIntent().getIntExtra(AudioPlayerService.EXTRA_START_POSITION_MS, 0);
+        lastSavedPositionMs = currentPositionMs;
+        coverImage = getIntent().getStringExtra("cover_image");
         String coverColor = getIntent().getStringExtra("cover_color");
         String coverEmoji = getIntent().getStringExtra("cover_emoji");
+        repository = new FonosRepository(this);
 
         TextView titleView = findViewById(R.id.tvPlayerTitle);
         TextView authorView = findViewById(R.id.tvPlayerAuthor);
@@ -70,6 +99,7 @@ public class PlayerActivity extends BaseActivity {
         TextView emojiView = findViewById(R.id.tvPlayerEmoji);
         playPauseButton = findViewById(R.id.btnPlayPause);
         Button stopButton = findViewById(R.id.btnStop);
+        downloadButton = findViewById(R.id.btnDownload);
         progressBar = findViewById(R.id.sbPlayerProgress);
         timeView = findViewById(R.id.tvPlayerTime);
 
@@ -105,6 +135,7 @@ public class PlayerActivity extends BaseActivity {
         playPauseButton.setOnClickListener(v -> {
             if (isPlaying) {
                 saveListeningProgress();
+                savePlaybackSnapshot(false);
                 pauseAudio();
                 playPauseButton.setText(R.string.play);
             } else {
@@ -116,6 +147,7 @@ public class PlayerActivity extends BaseActivity {
 
         stopButton.setOnClickListener(v -> {
             saveListeningProgress();
+            savePlaybackSnapshot(true);
             stopAudio();
             currentPositionMs = 0;
             lastSavedPositionMs = 0;
@@ -123,6 +155,17 @@ public class PlayerActivity extends BaseActivity {
             playPauseButton.setText(R.string.play);
             isPlaying = false;
         });
+
+        downloadButton.setOnClickListener(v -> {
+            if (bookId <= 0) return;
+            downloadButton.setText(getString(R.string.download_in_progress) + " 0%");
+            ContentDownloadService.startDownload(this, bookId, title);
+            Toast.makeText(this, R.string.download_started, Toast.LENGTH_SHORT).show();
+        });
+
+        loadSavedProgress();
+        loadDownloadState();
+        updateProgressUi();
     }
 
     @Override
@@ -134,11 +177,19 @@ public class PlayerActivity extends BaseActivity {
         } else {
             registerReceiver(progressReceiver, filter);
         }
+
+        IntentFilter downloadFilter = new IntentFilter(ContentDownloadService.ACTION_DOWNLOAD_PROGRESS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(downloadReceiver, downloadFilter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(downloadReceiver, downloadFilter);
+        }
     }
 
     @Override
     protected void onStop() {
         unregisterReceiver(progressReceiver);
+        unregisterReceiver(downloadReceiver);
         super.onStop();
     }
 
@@ -148,6 +199,8 @@ public class PlayerActivity extends BaseActivity {
         intent.putExtra(AudioPlayerService.EXTRA_TITLE, title);
         intent.putExtra(AudioPlayerService.EXTRA_AUTHOR, author);
         intent.putExtra(AudioPlayerService.EXTRA_AUDIO_RES, audioResName);
+        intent.putExtra(AudioPlayerService.EXTRA_BOOK_ID, bookId);
+        intent.putExtra(AudioPlayerService.EXTRA_START_POSITION_MS, currentPositionMs);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
@@ -177,6 +230,7 @@ public class PlayerActivity extends BaseActivity {
 
     private void closePlayer() {
         saveListeningProgress();
+        savePlaybackSnapshot(false);
         stopAudio();
         finish();
     }
@@ -222,5 +276,68 @@ public class PlayerActivity extends BaseActivity {
                 .fonosDao()
                 .insertListeningHistory(new ListeningHistory(bookId, deltaSeconds))
         ).start();
+    }
+
+    private void savePlaybackSnapshot(boolean resetPosition) {
+        if (bookId <= 0) return;
+
+        int savedPositionMs = resetPosition ? 0 : Math.max(0, currentPositionMs);
+        int savedDurationMs = Math.max(0, currentDurationMs);
+        repository.saveListeningProgressForCurrentUser(
+                bookId,
+                title,
+                author,
+                coverImage,
+                savedPositionMs,
+                savedDurationMs
+        );
+        new Thread(() -> AppDatabase
+                .getInstance(getApplicationContext())
+                .fonosDao()
+                .upsertListeningProgress(new ListeningProgress(
+                        bookId,
+                        savedPositionMs,
+                        savedDurationMs,
+                        System.currentTimeMillis()
+                ))
+        ).start();
+    }
+
+    private void loadSavedProgress() {
+        if (bookId <= 0) return;
+
+        new Thread(() -> {
+            ListeningProgress progress = AppDatabase
+                    .getInstance(getApplicationContext())
+                    .fonosDao()
+                    .getListeningProgress(bookId);
+
+            if (progress == null || progress.positionMs <= 0) return;
+
+            runOnUiThread(() -> {
+                currentPositionMs = progress.positionMs;
+                currentDurationMs = progress.durationMs;
+                lastSavedPositionMs = progress.positionMs;
+                updateProgressUi();
+            });
+        }).start();
+    }
+
+    private void loadDownloadState() {
+        if (bookId <= 0) return;
+
+        new Thread(() -> {
+            int downloadedCount = AppDatabase
+                    .getInstance(getApplicationContext())
+                    .fonosDao()
+                    .isBookDownloaded(bookId);
+
+            if (downloadedCount <= 0) return;
+
+            runOnUiThread(() -> {
+                downloadButton.setEnabled(false);
+                downloadButton.setText(R.string.downloaded);
+            });
+        }).start();
     }
 }

@@ -148,5 +148,18 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <Button
+            android:id="@+id/btnDownload"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/btn_outline"
+            android:stateListAnimator="@null"
+            android:text="@string/download"
+            android:textAllCaps="false"
+            android:textColor="#1A2B5F"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

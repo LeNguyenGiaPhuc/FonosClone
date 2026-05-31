@@ -3,19 +3,27 @@ package hcmute.com.fonosclone;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import hcmute.com.fonosclone.data.AppDatabase;
 import hcmute.com.fonosclone.data.Book;
 import hcmute.com.fonosclone.data.FonosDao;
+import hcmute.com.fonosclone.data.ListeningProgress;
 import hcmute.com.fonosclone.data.PodCourse;
 
 public final class FonosRepository {
+    private static final String TAG = "FonosRepository";
 
     private final FonosDao dao;
     private final FirebaseFirestore firestore;
@@ -128,5 +136,186 @@ public final class FonosRepository {
                     }).start();
                 })
                 .addOnFailureListener(e -> callback.onFailure(e));
+    }
+
+    public void syncFavoritesForCurrentUser(final SyncCallback callback) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            mainHandler.post(callback::onSuccess);
+            return;
+        }
+
+        firestore.collection("users")
+                .document(user.getUid())
+                .collection("favorites")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    final List<Integer> favoriteBookIds = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        Long bookIdLong = doc.getLong("bookId");
+                        if (bookIdLong != null) {
+                            favoriteBookIds.add(bookIdLong.intValue());
+                            continue;
+                        }
+
+                        try {
+                            String documentId = doc.getId().replace("book_", "");
+                            favoriteBookIds.add(Integer.parseInt(documentId));
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
+
+                    new Thread(() -> {
+                        try {
+                            dao.clearBookFavorites();
+                            for (Integer bookId : favoriteBookIds) {
+                                dao.setFavorite(bookId, true);
+                            }
+                            mainHandler.post(callback::onSuccess);
+                        } catch (Exception e) {
+                            mainHandler.post(() -> callback.onFailure(e));
+                        }
+                    }).start();
+                })
+                .addOnFailureListener(e -> callback.onFailure(e));
+    }
+
+    public void setFavoriteForCurrentUser(Book book, boolean isFavorite) {
+        setFavoriteForCurrentUser(book, isFavorite, null);
+    }
+
+    public void setFavoriteForCurrentUser(Book book, boolean isFavorite, final SyncCallback callback) {
+        new Thread(() -> {
+            try {
+                dao.setFavorite(book.id, isFavorite);
+                if (callback != null) {
+                    mainHandler.post(callback::onSuccess);
+                }
+            } catch (Exception e) {
+                if (callback != null) {
+                    mainHandler.post(() -> callback.onFailure(e));
+                }
+            }
+        }).start();
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            return;
+        }
+
+        if (isFavorite) {
+            Map<String, Object> favoriteData = new HashMap<>();
+            favoriteData.put("bookId", book.id);
+            favoriteData.put("title", book.title);
+            favoriteData.put("author", book.author);
+            favoriteData.put("type", book.type);
+            favoriteData.put("coverImage", book.coverImage);
+            favoriteData.put("updatedAt", FieldValue.serverTimestamp());
+
+            firestore.collection("users")
+                    .document(user.getUid())
+                    .collection("favorites")
+                    .document("book_" + book.id)
+                    .set(favoriteData)
+                    .addOnFailureListener(e -> Log.e(TAG, "Failed to save favorite to Firestore", e));
+        } else {
+            firestore.collection("users")
+                    .document(user.getUid())
+                    .collection("favorites")
+                    .document("book_" + book.id)
+                    .delete()
+                    .addOnFailureListener(e -> Log.e(TAG, "Failed to delete favorite from Firestore", e));
+        }
+    }
+
+    public void syncListeningProgressForCurrentUser(final SyncCallback callback) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            mainHandler.post(callback::onSuccess);
+            return;
+        }
+
+        firestore.collection("users")
+                .document(user.getUid())
+                .collection("listening_progress")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    final List<ListeningProgress> cloudProgress = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        Long bookIdLong = doc.getLong("bookId");
+                        Long positionMsLong = doc.getLong("positionMs");
+                        Long durationMsLong = doc.getLong("durationMs");
+                        Long updatedAtMillisLong = doc.getLong("updatedAtMillis");
+
+                        if (bookIdLong == null) {
+                            try {
+                                String documentId = doc.getId().replace("book_", "");
+                                bookIdLong = Long.parseLong(documentId);
+                            } catch (NumberFormatException ignored) {
+                            }
+                        }
+
+                        if (bookIdLong == null || positionMsLong == null || durationMsLong == null) {
+                            continue;
+                        }
+
+                        long updatedAtMillis = updatedAtMillisLong != null
+                                ? updatedAtMillisLong
+                                : System.currentTimeMillis();
+                        cloudProgress.add(new ListeningProgress(
+                                bookIdLong.intValue(),
+                                positionMsLong.intValue(),
+                                durationMsLong.intValue(),
+                                updatedAtMillis
+                        ));
+                    }
+
+                    new Thread(() -> {
+                        try {
+                            for (ListeningProgress progress : cloudProgress) {
+                                ListeningProgress localProgress = dao.getListeningProgress(progress.bookId);
+                                if (localProgress == null || progress.updatedAt >= localProgress.updatedAt) {
+                                    dao.upsertListeningProgress(progress);
+                                }
+                            }
+                            mainHandler.post(callback::onSuccess);
+                        } catch (Exception e) {
+                            mainHandler.post(() -> callback.onFailure(e));
+                        }
+                    }).start();
+                })
+                .addOnFailureListener(e -> callback.onFailure(e));
+    }
+
+    public void saveListeningProgressForCurrentUser(
+            int bookId,
+            String title,
+            String author,
+            String coverImage,
+            int positionMs,
+            int durationMs
+    ) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || bookId <= 0 || durationMs <= 0) {
+            return;
+        }
+
+        long updatedAtMillis = System.currentTimeMillis();
+        Map<String, Object> progressData = new HashMap<>();
+        progressData.put("bookId", bookId);
+        progressData.put("title", title);
+        progressData.put("author", author);
+        progressData.put("coverImage", coverImage);
+        progressData.put("positionMs", Math.max(0, positionMs));
+        progressData.put("durationMs", Math.max(0, durationMs));
+        progressData.put("updatedAtMillis", updatedAtMillis);
+        progressData.put("updatedAt", FieldValue.serverTimestamp());
+
+        firestore.collection("users")
+                .document(user.getUid())
+                .collection("listening_progress")
+                .document("book_" + bookId)
+                .set(progressData)
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to save listening progress to Firestore", e));
     }
 }
