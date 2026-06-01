@@ -6,8 +6,8 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 @Database(
-        entities = {Book.class, PodCourse.class, ListeningHistory.class, ListeningProgress.class, DownloadedContent.class},
-        version = 9,
+        entities = {Book.class, PodCourse.class, ListeningHistory.class, ListeningProgress.class, DownloadedContent.class, ChallengeCompletion.class, UserPoints.class},
+        version = 10,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {

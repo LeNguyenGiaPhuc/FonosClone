@@ -23,6 +23,12 @@ public interface FonosDao {
     @Insert
     void insertListeningHistory(ListeningHistory history);
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertChallengeCompletion(ChallengeCompletion completion);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void upsertUserPoints(UserPoints points);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsertListeningProgress(ListeningProgress progress);
 
@@ -31,6 +37,24 @@ public interface FonosDao {
 
     @Query("SELECT COALESCE(SUM(listenedSeconds), 0) FROM listening_history")
     int getTotalListenedSeconds();
+
+    @Query("SELECT COALESCE(SUM(listenedSeconds), 0) FROM listening_history WHERE listenedAt BETWEEN :startMillis AND :endMillis")
+    int getListenedSecondsBetween(long startMillis, long endMillis);
+
+    @Query("SELECT * FROM listening_history WHERE listenedAt BETWEEN :startMillis AND :endMillis")
+    List<ListeningHistory> getListeningHistoryBetween(long startMillis, long endMillis);
+
+    @Query("SELECT COUNT(*) FROM listening_progress WHERE durationMs > 0 AND positionMs >= durationMs * 9 / 10 AND updatedAt BETWEEN :startMillis AND :endMillis")
+    int countCompletedBooksBetween(long startMillis, long endMillis);
+
+    @Query("SELECT COUNT(*) FROM challenge_completions WHERE missionId = :missionId AND periodKey = :periodKey")
+    int isMissionCompleted(String missionId, String periodKey);
+
+    @Query("SELECT COALESCE(SUM(pointsAwarded), 0) FROM challenge_completions")
+    int getTotalAwardedPoints();
+
+    @Query("SELECT * FROM user_points WHERE id = 1 LIMIT 1")
+    UserPoints getUserPoints();
 
     @Query("SELECT * FROM listening_progress WHERE bookId = :bookId LIMIT 1")
     ListeningProgress getListeningProgress(int bookId);
