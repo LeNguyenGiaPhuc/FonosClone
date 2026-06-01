@@ -7,10 +7,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -44,19 +45,19 @@ public class ContentDownloadService extends Service {
     public static final String EXTRA_REMOTE_AUDIO_SOURCE = "extra_remote_audio_source";
     public static final String EXTRA_PROGRESS = "extra_progress";
     public static final String EXTRA_STATUS = "extra_status";
+    public static final String EXTRA_ERROR_MESSAGE = "extra_error_message";
 
     public static final String STATUS_RUNNING = "running";
     public static final String STATUS_COMPLETED = "completed";
     public static final String STATUS_CANCELLED = "cancelled";
+    public static final String STATUS_FAILED = "failed";
 
     private static final String TAG = "ContentDownloadService";
     private static final String CHANNEL_ID = "content_download";
     private static final int NOTIFICATION_ID = 68;
     private static final int PROGRESS_MAX = 100;
-    private static final int PROGRESS_STEP = 5;
-    private static final long PROGRESS_DELAY_MS = 350L;
+    private static final int HTTP_TIMEOUT_MS = 15000;
 
-    private final Handler handler = new Handler(Looper.getMainLooper());
     private String currentContentId = "";
     private String currentTitle = "";
     private String currentAudioResName = "";
@@ -67,22 +68,7 @@ public class ContentDownloadService extends Service {
     private volatile boolean isCancelled;
     private String completedLocalAudioPath = "";
     private String completedRemoteAudioSource = "";
-
-    private final Runnable progressRunnable = new Runnable() {
-        @Override
-        public void run() {
-            progress = Math.min(PROGRESS_MAX, progress + PROGRESS_STEP);
-
-            if (progress >= PROGRESS_MAX) {
-                completeDownload("", firstNonBlank(currentAudioUrl, currentAudioStoragePath, currentAudioResName));
-                return;
-            }
-
-            sendProgressBroadcast(STATUS_RUNNING);
-            updateNotification(progress);
-            handler.postDelayed(this, PROGRESS_DELAY_MS);
-        }
-    };
+    private String lastErrorMessage = "";
 
     public static void startDownload(Context context, String contentId, String title) {
         Intent intent = new Intent(context, ContentDownloadService.class);
@@ -166,15 +152,22 @@ public class ContentDownloadService extends Service {
     }
 
     private void startDownloadFlow() {
-        handler.removeCallbacks(progressRunnable);
         isCancelled = false;
         progress = 0;
+        completedLocalAudioPath = "";
+        completedRemoteAudioSource = "";
+        lastErrorMessage = "";
         sendProgressBroadcast(STATUS_RUNNING);
         startForeground(NOTIFICATION_ID, buildNotification(progress, false));
 
         String remoteSource = firstNonBlank(currentAudioUrl, currentAudioStoragePath);
         if (isBlank(remoteSource)) {
-            handler.postDelayed(progressRunnable, PROGRESS_DELAY_MS);
+            failDownload(getString(R.string.download_no_remote_source));
+            return;
+        }
+
+        if (!isNetworkAvailable()) {
+            failDownload(getString(R.string.download_no_network));
             return;
         }
 
@@ -212,7 +205,13 @@ public class ContentDownloadService extends Service {
             HttpURLConnection connection = null;
             try {
                 connection = (HttpURLConnection) new URL(audioUrl).openConnection();
+                connection.setConnectTimeout(HTTP_TIMEOUT_MS);
+                connection.setReadTimeout(HTTP_TIMEOUT_MS);
                 connection.connect();
+                int responseCode = connection.getResponseCode();
+                if (responseCode < HttpURLConnection.HTTP_OK || responseCode >= HttpURLConnection.HTTP_MULT_CHOICE) {
+                    throw new IllegalStateException("HTTP " + responseCode);
+                }
                 int length = connection.getContentLength();
                 try (InputStream input = connection.getInputStream();
                      FileOutputStream output = new FileOutputStream(destination)) {
@@ -230,6 +229,9 @@ public class ContentDownloadService extends Service {
                 if (isCancelled) {
                     destination.delete();
                     return;
+                }
+                if (!destination.exists() || destination.length() == 0) {
+                    throw new IllegalStateException("Downloaded file is empty");
                 }
                 completeDownload(destination.getAbsolutePath(), audioUrl);
             } catch (Exception e) {
@@ -272,14 +274,19 @@ public class ContentDownloadService extends Service {
 
     private void failDownload(Exception e) {
         Log.e(TAG, "Download failed", e);
-        sendProgressBroadcast(STATUS_CANCELLED);
+        failDownload(e.getMessage());
+    }
+
+    private void failDownload(String message) {
+        lastErrorMessage = isBlank(message) ? getString(R.string.download_failed) : message;
+        Log.e(TAG, "Download failed: " + lastErrorMessage);
+        sendProgressBroadcast(STATUS_FAILED);
         stopForeground(true);
         stopSelf();
     }
 
     private void cancelDownloadFlow() {
         isCancelled = true;
-        handler.removeCallbacks(progressRunnable);
         sendProgressBroadcast(STATUS_CANCELLED);
         stopForeground(true);
         stopSelf();
@@ -346,6 +353,7 @@ public class ContentDownloadService extends Service {
         intent.putExtra(EXTRA_STATUS, status);
         intent.putExtra(EXTRA_LOCAL_AUDIO_PATH, completedLocalAudioPath);
         intent.putExtra(EXTRA_REMOTE_AUDIO_SOURCE, completedRemoteAudioSource);
+        intent.putExtra(EXTRA_ERROR_MESSAGE, lastErrorMessage);
         sendBroadcast(intent);
     }
 
@@ -365,7 +373,6 @@ public class ContentDownloadService extends Service {
 
     @Override
     public void onDestroy() {
-        handler.removeCallbacks(progressRunnable);
         super.onDestroy();
     }
 
@@ -396,5 +403,26 @@ public class ContentDownloadService extends Service {
 
     private static boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (manager == null) {
+            return false;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            android.net.Network network = manager.getActiveNetwork();
+            if (network == null) {
+                return false;
+            }
+            NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);
+            return capabilities != null
+                    && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+        }
+
+        NetworkInfo activeNetwork = manager.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnected();
     }
 }

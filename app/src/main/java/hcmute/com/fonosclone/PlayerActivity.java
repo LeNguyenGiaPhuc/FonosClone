@@ -83,6 +83,17 @@ public class PlayerActivity extends BaseActivity {
             } else if (ContentDownloadService.STATUS_CANCELLED.equals(status)) {
                 downloadButton.setEnabled(true);
                 downloadButton.setText(R.string.download);
+            } else if (ContentDownloadService.STATUS_FAILED.equals(status)) {
+                String errorMessage = intent.getStringExtra(ContentDownloadService.EXTRA_ERROR_MESSAGE);
+                downloadButton.setEnabled(true);
+                downloadButton.setText(R.string.download);
+                Toast.makeText(
+                        PlayerActivity.this,
+                        errorMessage == null || errorMessage.trim().isEmpty()
+                                ? getString(R.string.download_failed)
+                                : errorMessage,
+                        Toast.LENGTH_LONG
+                ).show();
             }
         }
     };

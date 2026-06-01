@@ -81,6 +81,9 @@
     <string name="download_started">Download started</string>
     <string name="download_in_progress">Downloading</string>
     <string name="download_completed">Download complete</string>
+    <string name="download_failed">Download failed</string>
+    <string name="download_no_network">No internet connection. Connect to the internet to download.</string>
+    <string name="download_no_remote_source">This book does not have a remote audio file to download.</string>
     <string name="best_seller">BEST SELLER</string>
 
     <!-- Recommended section -->
