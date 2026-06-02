@@ -514,5 +514,89 @@
     "audioUrl": "",
     "audioStoragePath": "",
     "isFavorite": false
+  },
+  {
+    "id": 44,
+    "title": "Giải mã siêu trí tuệ",
+    "author": "Vishen Lakhiani",
+    "type": "AUDIOBOOK",
+    "category": "Khoa học - Công nghệ",
+    "coverImage": "giai_ma_sieu_tri_tue",
+    "audioResName": "demo_audio",
+    "audioUrl": "",
+    "audioStoragePath": "",
+    "isFavorite": false
+  },
+  {
+    "id": 45,
+    "title": "Cùng em lớn lên trong thời đại số: Định hướng nghề nghiệp và phát triển bản thân trong thời đại số",
+    "author": "Lưu Thùy Anh, Nguyễn Khắc Anh Thư, Nguyễn Như Quỳnh",
+    "type": "AUDIOBOOK",
+    "category": "Khoa học - Công nghệ",
+    "coverImage": "cung_em_lon_len_trong_thoi_dai_so",
+    "audioResName": "demo_audio",
+    "audioUrl": "",
+    "audioStoragePath": "",
+    "isFavorite": false
+  },
+  {
+    "id": 46,
+    "title": "Cẩm nang phòng chống tin giả, tin sai sự thật trên không gian mạng",
+    "author": "Cục Phát thanh, Truyền hình và Thông tin điện tử",
+    "type": "AUDIOBOOK",
+    "category": "Khoa học - Công nghệ",
+    "coverImage": "cam_nang_phong_chong_tin_gia_tin_sai_su_that",
+    "audioResName": "demo_audio",
+    "audioUrl": "",
+    "audioStoragePath": "",
+    "isFavorite": false
+  },
+  {
+    "id": 47,
+    "title": "Chat GPT và 10++ ứng dụng AI đình đám",
+    "author": "Tuấn Hà",
+    "type": "AUDIOBOOK",
+    "category": "Khoa học - Công nghệ",
+    "coverImage": "chat_gpt_va_10_ung_dung_ai_dinh_dam",
+    "audioResName": "demo_audio",
+    "audioUrl": "",
+    "audioStoragePath": "",
+    "isFavorite": false
+  },
+  {
+    "id": 48,
+    "title": "Sự trỗi dậy của chủ nghĩa xã hội công nghệ",
+    "author": "Brett King, Dr Richard Petty",
+    "type": "AUDIOBOOK",
+    "category": "Khoa học - Công nghệ",
+    "coverImage": "su_troi_day_cua_chu_nghia_xa_hoi_cong_nghe",
+    "audioResName": "demo_audio",
+    "audioUrl": "",
+    "audioStoragePath": "",
+    "isFavorite": false
+  },
+  {
+    "id": 49,
+    "title": "Một số giải pháp đảm bảo an toàn cho học sinh khi sử dụng mạng Internet",
+    "author": "Bộ Khoa học và Công Nghệ",
+    "type": "AUDIOBOOK",
+    "category": "Khoa học - Công nghệ",
+    "coverImage": "mot_so_giai_phap_an_toan_cho_hoc_sinh_khi_su_dung_internet",
+    "audioResName": "demo_audio",
+    "audioUrl": "",
+    "audioStoragePath": "",
+    "isFavorite": false
+  },
+  {
+    "id": 50,
+    "title": "Moonshot - Kỳ tích Pfizer",
+    "author": "Albert Bourla",
+    "type": "AUDIOBOOK",
+    "category": "Khoa học - Công nghệ",
+    "coverImage": "moonshot_ky_tich_pfizer",
+    "audioResName": "demo_audio",
+    "audioUrl": "",
+    "audioStoragePath": "",
+    "isFavorite": false
   }
 ]
