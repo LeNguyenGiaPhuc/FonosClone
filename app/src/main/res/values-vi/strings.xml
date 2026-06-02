@@ -82,6 +82,11 @@
     <string name="download_in_progress">Đang tải</string>
     <string name="download_completed">Tải xong</string>
     <string name="download_failed">Tải thất bại</string>
+    <string name="download_queue_progress">%1$d/%2$d mục</string>
+    <string name="download_queue_summary">%1$d đã tải, %2$d lỗi</string>
+    <string name="download_status_waiting">Đang chờ</string>
+    <string name="download_status_done">Xong</string>
+    <string name="download_status_failed">Lỗi</string>
     <string name="download_no_network">Không có kết nối internet. Hãy kết nối mạng để tải.</string>
     <string name="download_no_remote_source">Sách này chưa có file audio online để tải.</string>
     <string name="download_unavailable">Chưa có file tải</string>
