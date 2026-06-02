@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "title": "AI for Beginners",
+    "teacher": "Nam Nguyễn",
+    "category": "Technology",
+    "coverColor": "#1E8080",
+    "rating": 4.8
+  },
+  {
+    "id": 2,
+    "title": "Management for First-Time Leaders",
+    "teacher": "Vũ Đức Trí",
+    "category": "Management",
+    "coverColor": "#7A5540",
+    "rating": 4.7
+  },
+  {
+    "id": 3,
+    "title": "Personal Finance Thinking",
+    "teacher": "Trần Việt Quân",
+    "category": "Finance",
+    "coverColor": "#1A3A5C",
+    "rating": 4.7
+  },
+  {
+    "id": 4,
+    "title": "Kỹ năng thuyết trình chuyên nghiệp",
+    "teacher": "Nhiều tác giả",
+    "category": "Soft Skills",
+    "coverColor": "#5A3E91",
+    "rating": 4.6
+  },
+  {
+    "id": 5,
+    "title": "Startup 101: Từ ý tưởng đến gọi vốn",
+    "teacher": "Lâm Minh Chánh",
+    "category": "Business",
+    "coverColor": "#A63B3B",
+    "rating": 4.9
+  },
+  {
+    "id": 6,
+    "title": "Product Management Đột phá",
+    "teacher": "Hoàng Nam Tiến",
+    "category": "Product",
+    "coverColor": "#2E6930",
+    "rating": 4.8
+  }
+]

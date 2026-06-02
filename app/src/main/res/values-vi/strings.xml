@@ -76,16 +76,27 @@
     <string name="player_time_format">%1$s / %2$s</string>
     <string name="download_channel_name">Tải nội dung</string>
     <string name="download_default_title">Nội dung audio</string>
+    <string name="download">Tải xuống</string>
+    <string name="downloaded">Đã tải</string>
+    <string name="download_started">Đã bắt đầu tải</string>
     <string name="download_in_progress">Đang tải</string>
     <string name="download_completed">Tải xong</string>
+    <string name="download_failed">Tải thất bại</string>
+    <string name="download_no_network">Không có kết nối internet. Hãy kết nối mạng để tải.</string>
+    <string name="download_no_remote_source">Sách này chưa có file audio online để tải.</string>
+    <string name="download_unavailable">Chưa có file tải</string>
+    <string name="play_no_network">Không có kết nối internet. Hãy tải nội dung trước để nghe offline.</string>
     <string name="best_seller"> BÁN CHẠY NHẤT</string>
 
     <!-- Recommended section -->
-    <string name="recommended_for_you">12 Sách Nói Dành Cho Bạn</string>
+    <string name="recommended_for_you">Sách nói dành cho bạn</string>
+    <string name="audiobooks_count_title">Có %1$d sách nói</string>
     <string name="recommended_subtitle">Phù hợp với người mới — bấm để nghe ngay</string>
-    <string name="recommended_ebooks">12 Sách Điện Tử Cho Bạn</string>
+    <string name="recommended_ebooks">Sách điện tử cho bạn</string>
+    <string name="ebooks_count_title">Có %1$d sách điện tử</string>
     <string name="recommended_ebooks_subtitle">Đọc mọi lúc, mọi nơi — bấm để xem</string>
-    <string name="recommended_summaries">12 Tóm Tắt Sách Cho Bạn</string>
+    <string name="recommended_summaries">Tóm tắt sách cho bạn</string>
+    <string name="summaries_count_title">Có %1$d tóm tắt sách</string>
     <string name="recommended_summaries_subtitle">Kiến thức trọng tâm trong 15 phút — bấm để đọc</string>
     <string name="see_all">Xem tất cả</string>
 

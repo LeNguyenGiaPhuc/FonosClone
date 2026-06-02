@@ -1,7 +1,11 @@
 package hcmute.com.fonosclone;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +33,23 @@ public class MainActivity extends BaseActivity {
     private Book continueBook;
     private int continuePositionMs;
     private AppDatabase appDatabase;
+    private boolean playbackReceiverRegistered;
+
+    private final BroadcastReceiver playbackProgressReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!AudioPlayerService.ACTION_PROGRESS.equals(intent.getAction())) return;
+            if (continueBook == null) return;
+
+            int progressBookId = intent.getIntExtra(AudioPlayerService.EXTRA_BOOK_ID, 0);
+            if (progressBookId != continueBook.id) return;
+
+            int positionMs = intent.getIntExtra(AudioPlayerService.EXTRA_POSITION_MS, 0);
+            int durationMs = intent.getIntExtra(AudioPlayerService.EXTRA_DURATION_MS, 0);
+            boolean isPlaying = intent.getBooleanExtra(AudioPlayerService.EXTRA_IS_PLAYING, false);
+            updateContinueProgress(positionMs, durationMs, isPlaying);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +123,27 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter(AudioPlayerService.ACTION_PROGRESS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(playbackProgressReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(playbackProgressReceiver, filter);
+        }
+        playbackReceiverRegistered = true;
+    }
+
+    @Override
+    protected void onStop() {
+        if (playbackReceiverRegistered) {
+            unregisterReceiver(playbackProgressReceiver);
+            playbackReceiverRegistered = false;
+        }
+        super.onStop();
+    }
+
     private void loadLocalBooks(AppDatabase db) {
         new Thread(() -> {
             FonosDao dao = db.fonosDao();
@@ -122,6 +164,10 @@ public class MainActivity extends BaseActivity {
                 currentAudiobooks.clear();
                 currentAudiobooks.addAll(audiobooks);
                 bindContinueListening(finalLatestBook, finalLatestProgress);
+                TextView countTitle = findViewById(R.id.tvAudiobookCountTitle);
+                if (countTitle != null) {
+                    countTitle.setText(getString(R.string.audiobooks_count_title, audiobooks.size()));
+                }
 
                 if (audiobooks.size() > 0) {
                     bindBook(audiobooks.get(0), R.id.ivGridCover1, R.id.tvTitle1, R.id.tvAuthor1);
@@ -331,6 +377,24 @@ public class MainActivity extends BaseActivity {
         if (card != null) card.setOnClickListener(listener);
         if (play != null) play.setOnClickListener(listener);
         if (cover != null) cover.setOnClickListener(listener);
+    }
+
+    private void updateContinueProgress(int positionMs, int durationMs, boolean isPlaying) {
+        continuePositionMs = Math.max(0, positionMs);
+
+        TextView labelView = findViewById(R.id.tvContinueLabel);
+        TextView timeView = findViewById(R.id.tvContinueTime);
+        TextView playView = findViewById(R.id.btnContinuePlay);
+
+        if (labelView != null) {
+            labelView.setText(isPlaying ? R.string.now_playing : R.string.home_continue);
+        }
+        if (timeView != null && durationMs > 0) {
+            timeView.setText(formatPlayerTime(positionMs) + " / " + formatPlayerTime(durationMs));
+        }
+        if (playView != null) {
+            playView.setText(isPlaying ? R.string.now_playing : R.string.play);
+        }
     }
 
     private String formatPlayerTime(int millis) {

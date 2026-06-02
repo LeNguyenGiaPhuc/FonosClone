@@ -223,6 +223,7 @@
 
                         <!-- Category grid -->
                         <LinearLayout
+                            android:id="@+id/categoryGridContainer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"

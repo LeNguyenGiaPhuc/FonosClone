@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.graphics.Color;
@@ -44,6 +47,8 @@ public class PlayerActivity extends BaseActivity {
     private Button playPauseButton;
     private Button downloadButton;
     private FonosRepository repository;
+    private boolean hasDownloadedAudio;
+    private boolean isDownloadStateLoaded;
 
     private final BroadcastReceiver progressReceiver = new BroadcastReceiver() {
         @Override
@@ -74,6 +79,8 @@ public class PlayerActivity extends BaseActivity {
                         audioResName = localAudioFile.getAbsolutePath();
                         audioUrl = "";
                         audioStoragePath = "";
+                        hasDownloadedAudio = true;
+                        isDownloadStateLoaded = true;
                     }
                 }
                 downloadButton.setEnabled(false);
@@ -164,11 +171,10 @@ public class PlayerActivity extends BaseActivity {
                 savePlaybackSnapshot(false);
                 pauseAudio();
                 playPauseButton.setText(R.string.play);
+                isPlaying = false;
             } else {
                 playAudio();
-                playPauseButton.setText(R.string.pause);
             }
-            isPlaying = !isPlaying;
         });
 
         stopButton.setOnClickListener(v -> {
@@ -182,8 +188,18 @@ public class PlayerActivity extends BaseActivity {
             isPlaying = false;
         });
 
+        updateDownloadAvailability();
         downloadButton.setOnClickListener(v -> {
             if (bookId <= 0) return;
+            if (hasDownloadedAudio) {
+                downloadButton.setEnabled(false);
+                downloadButton.setText(R.string.downloaded);
+                return;
+            }
+            if (!isNetworkAvailable()) {
+                Toast.makeText(this, R.string.download_no_network, Toast.LENGTH_LONG).show();
+                return;
+            }
             downloadButton.setText(getString(R.string.download_in_progress) + " 0%");
             ContentDownloadService.startDownload(this, bookId, title, audioResName, audioUrl, audioStoragePath);
             Toast.makeText(this, R.string.download_started, Toast.LENGTH_SHORT).show();
@@ -220,11 +236,45 @@ public class PlayerActivity extends BaseActivity {
     }
 
     private void playAudio() {
+        if (hasDownloadedAudio && isLocalAudioFileAvailable()) {
+            startAudioService();
+            return;
+        }
+
+        if (!isDownloadStateLoaded) {
+            new Thread(() -> {
+                boolean downloaded = loadDownloadedAudioIfAvailable();
+                runOnUiThread(() -> {
+                    if (downloaded) {
+                        startAudioService();
+                    } else if (isNetworkAvailable()) {
+                        startAudioService();
+                    } else {
+                        Toast.makeText(PlayerActivity.this, R.string.play_no_network, Toast.LENGTH_LONG).show();
+                        updateProgressUi();
+                    }
+                });
+            }).start();
+            return;
+        }
+
+        if (!isNetworkAvailable()) {
+            Toast.makeText(this, R.string.play_no_network, Toast.LENGTH_LONG).show();
+            updateProgressUi();
+            return;
+        }
+
+        startAudioService();
+    }
+
+    private void startAudioService() {
         Intent intent = new Intent(this, AudioPlayerService.class);
         intent.setAction(AudioPlayerService.ACTION_PLAY);
         intent.putExtra(AudioPlayerService.EXTRA_TITLE, title);
         intent.putExtra(AudioPlayerService.EXTRA_AUTHOR, author);
         intent.putExtra(AudioPlayerService.EXTRA_AUDIO_RES, audioResName);
+        intent.putExtra(AudioPlayerService.EXTRA_AUDIO_URL, audioUrl);
+        intent.putExtra(AudioPlayerService.EXTRA_AUDIO_STORAGE_PATH, audioStoragePath);
         intent.putExtra(AudioPlayerService.EXTRA_BOOK_ID, bookId);
         intent.putExtra(AudioPlayerService.EXTRA_START_POSITION_MS, currentPositionMs);
 
@@ -233,6 +283,8 @@ public class PlayerActivity extends BaseActivity {
         } else {
             startService(intent);
         }
+        isPlaying = true;
+        playPauseButton.setText(R.string.pause);
     }
 
     private void requestNotificationPermissionIfNeeded() {
@@ -257,7 +309,6 @@ public class PlayerActivity extends BaseActivity {
     private void closePlayer() {
         saveListeningProgress();
         savePlaybackSnapshot(false);
-        stopAudio();
         finish();
     }
 
@@ -354,26 +405,80 @@ public class PlayerActivity extends BaseActivity {
         if (bookId <= 0) return;
 
         new Thread(() -> {
-            DownloadedContent downloadedContent = AppDatabase
-                    .getInstance(getApplicationContext())
-                    .fonosDao()
-                    .getDownloadedContent(bookId);
-
-            if (downloadedContent == null) return;
-
-            if (downloadedContent.localAudioPath != null && !downloadedContent.localAudioPath.trim().isEmpty()) {
-                File localAudioFile = new File(downloadedContent.localAudioPath);
-                if (localAudioFile.exists()) {
-                    audioResName = localAudioFile.getAbsolutePath();
-                    audioUrl = "";
-                    audioStoragePath = "";
-                }
-            }
+            boolean downloaded = loadDownloadedAudioIfAvailable();
 
             runOnUiThread(() -> {
-                downloadButton.setEnabled(false);
-                downloadButton.setText(R.string.downloaded);
+                if (downloaded) {
+                    downloadButton.setEnabled(false);
+                    downloadButton.setText(R.string.downloaded);
+                } else {
+                    updateDownloadAvailability();
+                }
             });
         }).start();
+    }
+
+    private void updateDownloadAvailability() {
+        if (downloadButton == null) return;
+
+        boolean downloadable = bookId > 0;
+        downloadButton.setEnabled(downloadable);
+        downloadButton.setText(downloadable ? R.string.download : R.string.download_unavailable);
+    }
+
+    private boolean loadDownloadedAudioIfAvailable() {
+        DownloadedContent downloadedContent = AppDatabase
+                .getInstance(getApplicationContext())
+                .fonosDao()
+                .getDownloadedContent(bookId);
+
+        isDownloadStateLoaded = true;
+        if (downloadedContent == null
+                || downloadedContent.localAudioPath == null
+                || downloadedContent.localAudioPath.trim().isEmpty()) {
+            hasDownloadedAudio = false;
+            return false;
+        }
+
+        File localAudioFile = new File(downloadedContent.localAudioPath);
+        if (!localAudioFile.exists() || localAudioFile.length() == 0) {
+            hasDownloadedAudio = false;
+            return false;
+        }
+
+        audioResName = localAudioFile.getAbsolutePath();
+        audioUrl = "";
+        audioStoragePath = "";
+        hasDownloadedAudio = true;
+        return true;
+    }
+
+    private boolean isLocalAudioFileAvailable() {
+        if (audioResName == null || audioResName.trim().isEmpty()) {
+            return false;
+        }
+        File localAudioFile = new File(audioResName);
+        return localAudioFile.exists() && localAudioFile.length() > 0;
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (manager == null) {
+            return false;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            android.net.Network network = manager.getActiveNetwork();
+            if (network == null) {
+                return false;
+            }
+            NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);
+            return capabilities != null
+                    && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                    && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+        }
+
+        NetworkInfo activeNetwork = manager.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnected();
     }
 }

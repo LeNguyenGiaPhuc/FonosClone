@@ -160,14 +160,14 @@ public class ContentDownloadService extends Service {
         sendProgressBroadcast(STATUS_RUNNING);
         startForeground(NOTIFICATION_ID, buildNotification(progress, false));
 
-        String remoteSource = firstNonBlank(currentAudioUrl, currentAudioStoragePath);
-        if (isBlank(remoteSource)) {
-            failDownload(getString(R.string.download_no_remote_source));
+        if (!isNetworkAvailable()) {
+            failDownload(getString(R.string.download_no_network));
             return;
         }
 
-        if (!isNetworkAvailable()) {
-            failDownload(getString(R.string.download_no_network));
+        String remoteSource = firstNonBlank(currentAudioUrl, currentAudioStoragePath);
+        if (isBlank(remoteSource)) {
+            copyLocalRawAudioToDownloadFile(isBlank(currentAudioResName) ? "demo_audio" : currentAudioResName);
             return;
         }
 
@@ -176,6 +176,43 @@ public class ContentDownloadService extends Service {
         } else {
             downloadFromFirebaseStorage(remoteSource);
         }
+    }
+
+    private void copyLocalRawAudioToDownloadFile(String audioResName) {
+        new Thread(() -> {
+            File destination = getDownloadFile();
+            try {
+                String resolvedAudioResName = audioResName;
+                int audioResId = getResources().getIdentifier(resolvedAudioResName, "raw", getPackageName());
+                if (audioResId == 0) {
+                    audioResId = R.raw.demo_audio;
+                    resolvedAudioResName = "demo_audio";
+                }
+
+                publishProgress(10);
+                try (InputStream input = getResources().openRawResource(audioResId);
+                     FileOutputStream output = new FileOutputStream(destination)) {
+                    byte[] buffer = new byte[8192];
+                    int read;
+                    while (!isCancelled && (read = input.read(buffer)) != -1) {
+                        output.write(buffer, 0, read);
+                    }
+                }
+
+                if (isCancelled) {
+                    destination.delete();
+                    return;
+                }
+                if (!destination.exists() || destination.length() == 0) {
+                    throw new IllegalStateException("Copied audio file is empty");
+                }
+
+                publishProgress(90);
+                completeDownload(destination.getAbsolutePath(), resolvedAudioResName);
+            } catch (Exception e) {
+                failDownload(e);
+            }
+        }).start();
     }
 
     private void downloadFromFirebaseStorage(String storagePath) {

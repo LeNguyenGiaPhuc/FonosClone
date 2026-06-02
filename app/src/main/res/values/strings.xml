@@ -84,19 +84,24 @@
     <string name="download_failed">Download failed</string>
     <string name="download_no_network">No internet connection. Connect to the internet to download.</string>
     <string name="download_no_remote_source">This book does not have a remote audio file to download.</string>
+    <string name="download_unavailable">No download file</string>
+    <string name="play_no_network">No internet connection. Download this content first to listen offline.</string>
     <string name="best_seller">BEST SELLER</string>
 
     <!-- Recommended section -->
-    <string name="recommended_for_you">12 Audiobooks For You</string>
+    <string name="recommended_for_you">Audiobooks For You</string>
+    <string name="audiobooks_count_title">%1$d Audiobooks Available</string>
     <string name="recommended_subtitle">Perfect for beginners — tap to listen</string>
     <string name="home_continue">Continue listening</string>
     <string name="home_today_pick">Today pick</string>
     <string name="home_minutes">15 min</string>
     <string name="home_trending">Trending now</string>
     <string name="home_fresh_release">Fresh releases</string>
-    <string name="recommended_ebooks">12 Ebooks For You</string>
+    <string name="recommended_ebooks">Ebooks For You</string>
+    <string name="ebooks_count_title">%1$d Ebooks Available</string>
     <string name="recommended_ebooks_subtitle">Read anywhere, anytime — tap to open</string>
-    <string name="recommended_summaries">12 Summaries For You</string>
+    <string name="recommended_summaries">Summaries For You</string>
+    <string name="summaries_count_title">%1$d Summaries Available</string>
     <string name="recommended_summaries_subtitle">Key insights in 15 minutes — tap to read</string>
     <string name="see_all">See all</string>
 

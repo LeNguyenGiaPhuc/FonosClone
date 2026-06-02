@@ -2,6 +2,7 @@ package hcmute.com.fonosclone;
 
 import android.os.Bundle;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -27,18 +28,24 @@ public class SummaryActivity extends BaseActivity {
 
     private void loadBooks() {
         LinearLayout container = findViewById(R.id.bookListContainer);
+        TextView titleView = findViewById(R.id.tvListTitle);
         FonosRepository repository = new FonosRepository(this);
         new Thread(() -> {
             FonosDao dao = AppDatabase.getInstance(getApplicationContext()).fonosDao();
             SeedData.insertSampleData(dao);
             List<Book> books = dao.getBooksByType("SUMMARY");
 
-            runOnUiThread(() -> BookListRenderer.render(
-                    this,
-                    container,
-                    books,
-                    repository::setFavoriteForCurrentUser
-            ));
+            runOnUiThread(() -> {
+                if (titleView != null) {
+                    titleView.setText(getString(R.string.summaries_count_title, books.size()));
+                }
+                BookListRenderer.render(
+                        this,
+                        container,
+                        books,
+                        repository::setFavoriteForCurrentUser
+                );
+            });
         }).start();
     }
 }

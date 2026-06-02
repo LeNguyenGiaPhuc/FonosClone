@@ -22,7 +22,7 @@ import com.google.firebase.storage.StorageReference;
 import hcmute.com.fonosclone.data.AppDatabase;
 import hcmute.com.fonosclone.data.ListeningProgress;
 
-public class AudioPlayerService extends Service {
+public class    AudioPlayerService extends Service {
 
     public static final String ACTION_PLAY = "hcmute.com.fonosclone.action.PLAY";
     public static final String ACTION_PAUSE = "hcmute.com.fonosclone.action.PAUSE";
@@ -63,6 +63,7 @@ public class AudioPlayerService extends Service {
     private int currentBookId;
     private int pendingStartPositionMs;
     private int lastPersistedPositionMs;
+    private int lastNotificationPositionMs = -1000;
 
     @Override
     public void onCreate() {
@@ -252,10 +253,13 @@ public class AudioPlayerService extends Service {
 
         persistProgress(position, duration, isPlaying);
 
+        intent.putExtra(EXTRA_BOOK_ID, currentBookId);
         intent.putExtra(EXTRA_POSITION_MS, position);
         intent.putExtra(EXTRA_DURATION_MS, duration);
         intent.putExtra(EXTRA_IS_PLAYING, isPlaying);
         sendBroadcast(intent);
+
+        updatePlaybackNotification(position, duration, isPlaying);
     }
 
     private Notification buildNotification(boolean isPlaying) {
@@ -298,19 +302,57 @@ public class AudioPlayerService extends Service {
                 ? getString(R.string.audio_notification_subtitle)
                 : currentAuthor;
 
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
+        int position = 0;
+        int duration = 0;
+        if (mediaPlayer != null) {
+            position = mediaPlayer.getCurrentPosition();
+            duration = mediaPlayer.getDuration();
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setContentTitle(title)
                 .setContentText(author)
                 .setContentIntent(contentIntent)
+                .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
+                .setOnlyAlertOnce(true)
+                .setShowWhen(false)
                 .setOngoing(isPlaying)
                 .addAction(
                         isPlaying ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play,
                         isPlaying ? getString(R.string.pause) : getString(R.string.play),
                         togglePendingIntent
                 )
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.stop), stopPendingIntent)
-                .build();
+                .addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.stop), stopPendingIntent);
+
+        if (duration > 0) {
+            builder.setProgress(duration, Math.min(position, duration), false)
+                    .setSubText(formatTime(position) + " / " + formatTime(duration));
+        }
+
+        return builder.build();
+    }
+
+    private void updatePlaybackNotification(int position, int duration, boolean isPlaying) {
+        if (duration <= 0 || mediaPlayer == null) {
+            return;
+        }
+        if (isPlaying && Math.abs(position - lastNotificationPositionMs) < 1000) {
+            return;
+        }
+
+        lastNotificationPositionMs = position;
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (manager != null) {
+            manager.notify(NOTIFICATION_ID, buildNotification(isPlaying));
+        }
+    }
+
+    private String formatTime(int millis) {
+        int totalSeconds = Math.max(0, millis / 1000);
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds);
     }
 
     private void createNotificationChannel() {
