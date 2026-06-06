@@ -17,30 +17,30 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FonosClone">
 
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".PodcourseActivity" />
-        <activity android:name=".SearchActivity" />
-        <activity android:name=".ChallengesActivity" />
-        <activity android:name=".LibraryActivity" />
-        <activity android:name=".EbookActivity" />
-        <activity android:name=".SummaryActivity" />
-        <activity android:name=".PlayerActivity" />
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".SettingsActivity" />
+        <activity android:name=".ui.activity.LoginActivity" />
+        <activity android:name=".ui.activity.RegisterActivity" />
+        <activity android:name=".ui.activity.PodcourseActivity" />
+        <activity android:name=".ui.activity.SearchActivity" />
+        <activity android:name=".ui.activity.ChallengesActivity" />
+        <activity android:name=".ui.activity.LibraryActivity" />
+        <activity android:name=".ui.activity.EbookActivity" />
+        <activity android:name=".ui.activity.SummaryActivity" />
+        <activity android:name=".ui.activity.PlayerActivity" />
+        <activity android:name=".ui.activity.ProfileActivity" />
+        <activity android:name=".ui.activity.SettingsActivity" />
 
         <service
-            android:name=".AudioPlayerService"
+            android:name=".service.AudioPlayerService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
         <service
-            android:name=".ContentDownloadService"
+            android:name=".service.ContentDownloadService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
