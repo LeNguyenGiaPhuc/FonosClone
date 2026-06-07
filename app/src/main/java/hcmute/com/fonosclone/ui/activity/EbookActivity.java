@@ -1,6 +1,7 @@
 package hcmute.com.fonosclone.ui.activity;
 
 
+import hcmute.com.fonosclone.auth.UserIdentity;
 import hcmute.com.fonosclone.data.local.AppDatabase;
 import hcmute.com.fonosclone.data.local.FonosDao;
 import hcmute.com.fonosclone.data.model.Book;
@@ -38,7 +39,7 @@ public class EbookActivity extends BaseActivity {
         new Thread(() -> {
             FonosDao dao = AppDatabase.getInstance(getApplicationContext()).fonosDao();
             SeedData.insertSampleData(dao);
-            List<Book> books = dao.getBooksByType("EBOOK");
+            List<Book> books = dao.getBooksByTypeForUser("EBOOK", UserIdentity.getCurrentUserId(getApplicationContext()));
 
             runOnUiThread(() -> {
                 if (titleView != null) {

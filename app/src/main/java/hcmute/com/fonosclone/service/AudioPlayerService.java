@@ -1,6 +1,7 @@
 package hcmute.com.fonosclone.service;
 
 
+import hcmute.com.fonosclone.auth.UserIdentity;
 import hcmute.com.fonosclone.data.local.AppDatabase;
 import hcmute.com.fonosclone.data.local.FonosDao;
 import hcmute.com.fonosclone.data.model.ListeningProgress;
@@ -415,6 +416,7 @@ public class    AudioPlayerService extends Service {
                 .getInstance(getApplicationContext())
                 .fonosDao()
                 .upsertListeningProgress(new ListeningProgress(
+                        UserIdentity.getCurrentUserId(getApplicationContext()),
                         currentBookId,
                         finalPositionMs,
                         finalDurationMs,

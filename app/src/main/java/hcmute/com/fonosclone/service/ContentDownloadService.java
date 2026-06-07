@@ -1,6 +1,7 @@
 package hcmute.com.fonosclone.service;
 
 
+import hcmute.com.fonosclone.auth.UserIdentity;
 import hcmute.com.fonosclone.data.local.AppDatabase;
 import hcmute.com.fonosclone.data.local.FonosDao;
 import hcmute.com.fonosclone.data.model.DownloadedContent;
@@ -566,6 +567,7 @@ public class ContentDownloadService extends Service {
                 .getInstance(getApplicationContext())
                 .fonosDao()
                 .upsertDownloadedContent(new DownloadedContent(
+                        UserIdentity.getCurrentUserId(getApplicationContext()),
                         item.bookId,
                         System.currentTimeMillis(),
                         item.localAudioPath,

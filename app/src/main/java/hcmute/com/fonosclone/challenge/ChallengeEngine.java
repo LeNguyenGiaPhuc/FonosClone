@@ -17,12 +17,10 @@ import java.util.Set;
 
 
 public final class ChallengeEngine {
-    private static final int POINTS_ROW_ID = 1;
-
     private ChallengeEngine() {
     }
 
-    public static ChallengeDashboard evaluate(FonosDao dao) {
+    public static ChallengeDashboard evaluate(FonosDao dao, String userId) {
         long now = System.currentTimeMillis();
         long dayStart = startOfDay(now);
         long dayEnd = endOfDay(now);
@@ -32,25 +30,25 @@ public final class ChallengeEngine {
         String dayKey = "day_" + formatDate(dayStart);
         String weekKey = "week_" + formatDate(weekStart);
 
-        int dailySeconds = dao.getListenedSecondsBetween(dayStart, dayEnd);
-        int weeklySeconds = dao.getListenedSecondsBetween(weekStart, weekEnd);
-        int weeklyCompletedBooks = dao.countCompletedBooksBetween(weekStart, weekEnd);
-        int weeklyActiveDays = countActiveDays(dao.getListeningHistoryBetween(weekStart, weekEnd));
+        int dailySeconds = dao.getListenedSecondsBetween(userId, dayStart, dayEnd);
+        int weeklySeconds = dao.getListenedSecondsBetween(userId, weekStart, weekEnd);
+        int weeklyCompletedBooks = dao.countCompletedBooksBetween(userId, weekStart, weekEnd);
+        int weeklyActiveDays = countActiveDays(dao.getListeningHistoryBetween(userId, weekStart, weekEnd));
 
         List<MissionState> dailyMissions = new ArrayList<>();
-        dailyMissions.add(evaluateMission(dao, "daily_5m", dayKey, "Listen or read for 5 minutes", "Easy mission", dailySeconds, 5 * 60, 50));
-        dailyMissions.add(evaluateMission(dao, "daily_15m", dayKey, "Listen or read for 15 minutes", "Medium mission", dailySeconds, 15 * 60, 120));
-        dailyMissions.add(evaluateMission(dao, "daily_30m", dayKey, "Listen or read for 30 minutes", "Hard mission", dailySeconds, 30 * 60, 250));
+        dailyMissions.add(evaluateMission(dao, userId, "daily_5m", dayKey, "Listen or read for 5 minutes", "Easy mission", dailySeconds, 5 * 60, 50));
+        dailyMissions.add(evaluateMission(dao, userId, "daily_15m", dayKey, "Listen or read for 15 minutes", "Medium mission", dailySeconds, 15 * 60, 120));
+        dailyMissions.add(evaluateMission(dao, userId, "daily_30m", dayKey, "Listen or read for 30 minutes", "Hard mission", dailySeconds, 30 * 60, 250));
 
         List<MissionState> weeklyMissions = new ArrayList<>();
-        weeklyMissions.add(evaluateMission(dao, "weekly_90m", weekKey, "Listen or read for 90 minutes", "Weekly medium mission", weeklySeconds, 90 * 60, 500));
-        weeklyMissions.add(evaluateMission(dao, "weekly_finish_1", weekKey, "Finish 1 book", "Reach 90% progress in any book", weeklyCompletedBooks, 1, 700));
-        weeklyMissions.add(evaluateMission(dao, "weekly_5_days", weekKey, "Be active for 5 days", "Listen or read on 5 different days", weeklyActiveDays, 5, 1000));
+        weeklyMissions.add(evaluateMission(dao, userId, "weekly_90m", weekKey, "Listen or read for 90 minutes", "Weekly medium mission", weeklySeconds, 90 * 60, 500));
+        weeklyMissions.add(evaluateMission(dao, userId, "weekly_finish_1", weekKey, "Finish 1 book", "Reach 90% progress in any book", weeklyCompletedBooks, 1, 700));
+        weeklyMissions.add(evaluateMission(dao, userId, "weekly_5_days", weekKey, "Be active for 5 days", "Listen or read on 5 different days", weeklyActiveDays, 5, 1000));
 
-        int totalPoints = dao.getTotalAwardedPoints();
-        UserPoints points = dao.getUserPoints();
+        int totalPoints = dao.getTotalAwardedPoints(userId);
+        UserPoints points = dao.getUserPoints(userId);
         if (points == null || points.totalPoints != totalPoints) {
-            dao.upsertUserPoints(new UserPoints(POINTS_ROW_ID, totalPoints));
+            dao.upsertUserPoints(new UserPoints(userId, totalPoints));
         }
 
         return new ChallengeDashboard(totalPoints, dailySeconds, weeklySeconds, dailyMissions, weeklyMissions);
@@ -58,6 +56,7 @@ public final class ChallengeEngine {
 
     private static MissionState evaluateMission(
             FonosDao dao,
+            String userId,
             String missionId,
             String periodKey,
             String title,
@@ -66,10 +65,11 @@ public final class ChallengeEngine {
             int target,
             int points
     ) {
-        boolean alreadyCompleted = dao.isMissionCompleted(missionId, periodKey) > 0;
+        boolean alreadyCompleted = dao.isMissionCompleted(userId, missionId, periodKey) > 0;
         boolean targetReached = progress >= target;
         if (targetReached && !alreadyCompleted) {
             dao.insertChallengeCompletion(new ChallengeCompletion(
+                    userId,
                     missionId,
                     periodKey,
                     points,

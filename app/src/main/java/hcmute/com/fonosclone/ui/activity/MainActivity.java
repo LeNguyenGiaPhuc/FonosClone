@@ -1,6 +1,7 @@
 package hcmute.com.fonosclone.ui.activity;
 
 
+import hcmute.com.fonosclone.auth.UserIdentity;
 import hcmute.com.fonosclone.data.local.AppDatabase;
 import hcmute.com.fonosclone.data.local.FonosDao;
 import hcmute.com.fonosclone.data.model.Book;
@@ -153,13 +154,14 @@ public class MainActivity extends BaseActivity {
     private void loadLocalBooks(AppDatabase db) {
         new Thread(() -> {
             FonosDao dao = db.fonosDao();
+            String userId = UserIdentity.getCurrentUserId(getApplicationContext());
             if (dao.countBooks() == 0) {
                 SeedData.insertSampleData(dao);
             }
 
-            List<Book> audiobooks = dao.getBooksByType("AUDIOBOOK");
-            ListeningProgress latestProgress = dao.getLatestListeningProgress();
-            Book latestBook = latestProgress != null ? dao.getBookById(latestProgress.bookId) : null;
+            List<Book> audiobooks = dao.getBooksByTypeForUser("AUDIOBOOK", userId);
+            ListeningProgress latestProgress = dao.getLatestListeningProgress(userId);
+            Book latestBook = latestProgress != null ? dao.getBookByIdForUser(latestProgress.bookId, userId) : null;
             if (latestBook == null && !audiobooks.isEmpty()) {
                 latestBook = audiobooks.get(0);
             }

@@ -2,6 +2,7 @@ package hcmute.com.fonosclone.ui.activity;
 
 
 import hcmute.com.fonosclone.auth.SessionManager;
+import hcmute.com.fonosclone.auth.UserIdentity;
 import hcmute.com.fonosclone.data.local.AppDatabase;
 import hcmute.com.fonosclone.data.local.FonosDao;
 import hcmute.com.fonosclone.R;
@@ -72,7 +73,7 @@ public class ProfileActivity extends BaseActivity {
             int listenedSeconds = AppDatabase
                     .getInstance(getApplicationContext())
                     .fonosDao()
-                    .getTotalListenedSeconds();
+                    .getTotalListenedSeconds(UserIdentity.getCurrentUserId(getApplicationContext()));
             int progress = Math.min(100, listenedSeconds * 100 / LEVEL_TARGET_SECONDS);
 
             runOnUiThread(() -> {

@@ -1,6 +1,7 @@
 package hcmute.com.fonosclone.ui.activity;
 
 
+import hcmute.com.fonosclone.auth.UserIdentity;
 import hcmute.com.fonosclone.data.local.AppDatabase;
 import hcmute.com.fonosclone.data.local.FonosDao;
 import hcmute.com.fonosclone.data.model.Book;
@@ -361,7 +362,12 @@ public class PlayerActivity extends BaseActivity {
         new Thread(() -> AppDatabase
                 .getInstance(getApplicationContext())
                 .fonosDao()
-                .insertListeningHistory(new ListeningHistory(bookId, deltaSeconds))
+                .insertListeningHistory(new ListeningHistory(
+                        UserIdentity.getCurrentUserId(getApplicationContext()),
+                        bookId,
+                        deltaSeconds,
+                        System.currentTimeMillis()
+                ))
         ).start();
     }
 
@@ -382,6 +388,7 @@ public class PlayerActivity extends BaseActivity {
                 .getInstance(getApplicationContext())
                 .fonosDao()
                 .upsertListeningProgress(new ListeningProgress(
+                        UserIdentity.getCurrentUserId(getApplicationContext()),
                         bookId,
                         savedPositionMs,
                         savedDurationMs,
@@ -398,7 +405,7 @@ public class PlayerActivity extends BaseActivity {
             ListeningProgress progress = AppDatabase
                     .getInstance(getApplicationContext())
                     .fonosDao()
-                    .getListeningProgress(bookId);
+                    .getListeningProgress(UserIdentity.getCurrentUserId(getApplicationContext()), bookId);
 
             if (progress == null || progress.positionMs <= 0) return;
 
@@ -440,7 +447,7 @@ public class PlayerActivity extends BaseActivity {
         DownloadedContent downloadedContent = AppDatabase
                 .getInstance(getApplicationContext())
                 .fonosDao()
-                .getDownloadedContent(bookId);
+                .getDownloadedContent(UserIdentity.getCurrentUserId(getApplicationContext()), bookId);
 
         isDownloadStateLoaded = true;
         if (downloadedContent == null

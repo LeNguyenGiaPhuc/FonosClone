@@ -4,8 +4,11 @@ package hcmute.com.fonosclone.worker;
 import hcmute.com.fonosclone.data.local.AppDatabase;
 import hcmute.com.fonosclone.data.local.FonosDao;
 import hcmute.com.fonosclone.data.model.Book;
+import hcmute.com.fonosclone.data.model.ChallengeCompletion;
 import hcmute.com.fonosclone.data.model.DownloadedContent;
+import hcmute.com.fonosclone.data.model.ListeningHistory;
 import hcmute.com.fonosclone.data.model.ListeningProgress;
+import hcmute.com.fonosclone.data.model.UserPoints;
 
 import android.content.Context;
 
@@ -49,9 +52,11 @@ public class FirebaseSyncWorker extends Worker {
             WriteBatch batch = firestore.batch();
             int writeCount = 0;
 
-            writeCount += addFavoriteWrites(batch, firestore, uid, dao.getFavoriteBooks());
+            writeCount += addFavoriteWrites(batch, firestore, uid, dao.getFavoriteBooks(uid));
             writeCount += addListeningProgressWrites(batch, firestore, uid, dao);
             writeCount += addDownloadWrites(batch, firestore, uid, dao);
+            writeCount += addListeningHistoryWrites(batch, firestore, uid, dao);
+            writeCount += addChallengeWrites(batch, firestore, uid, dao);
 
             if (writeCount > 0) {
                 Tasks.await(batch.commit());
@@ -89,7 +94,7 @@ public class FirebaseSyncWorker extends Worker {
 
     private int addListeningProgressWrites(WriteBatch batch, FirebaseFirestore firestore, String uid, FonosDao dao) {
         int writes = 0;
-        List<ListeningProgress> progressList = dao.getAllListeningProgress();
+        List<ListeningProgress> progressList = dao.getAllListeningProgress(uid);
         for (ListeningProgress progress : progressList) {
             Book book = dao.getBookById(progress.bookId);
             DocumentReference ref = firestore.collection("users")
@@ -114,7 +119,7 @@ public class FirebaseSyncWorker extends Worker {
 
     private int addDownloadWrites(WriteBatch batch, FirebaseFirestore firestore, String uid, FonosDao dao) {
         int writes = 0;
-        List<DownloadedContent> downloads = dao.getDownloadedContents();
+        List<DownloadedContent> downloads = dao.getDownloadedContents(uid);
         for (DownloadedContent download : downloads) {
             Book book = dao.getBookById(download.bookId);
             DocumentReference ref = firestore.collection("users")
@@ -139,6 +144,65 @@ public class FirebaseSyncWorker extends Worker {
         }
         return writes;
     }
+
+    private int addListeningHistoryWrites(WriteBatch batch, FirebaseFirestore firestore, String uid, FonosDao dao) {
+        int writes = 0;
+        List<ListeningHistory> historyList = dao.getListeningHistoryForUser(uid);
+        for (ListeningHistory history : historyList) {
+            Book book = dao.getBookById(history.bookId);
+            DocumentReference ref = firestore.collection("users")
+                    .document(uid)
+                    .collection("listening_history")
+                    .document("history_" + history.listenedAt + "_" + history.bookId);
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("bookId", history.bookId);
+            data.put("title", book != null ? book.title : "");
+            data.put("author", book != null ? book.author : "");
+            data.put("listenedSeconds", history.listenedSeconds);
+            data.put("listenedAt", history.listenedAt);
+            data.put("updatedAt", FieldValue.serverTimestamp());
+            batch.set(ref, data);
+            writes++;
+        }
+        return writes;
+    }
+
+    private int addChallengeWrites(WriteBatch batch, FirebaseFirestore firestore, String uid, FonosDao dao) {
+        int writes = 0;
+        for (ChallengeCompletion completion : dao.getChallengeCompletions(uid)) {
+            DocumentReference ref = firestore.collection("users")
+                    .document(uid)
+                    .collection("challenge_progress")
+                    .document(completion.missionId + "_" + completion.periodKey);
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("missionId", completion.missionId);
+            data.put("periodKey", completion.periodKey);
+            data.put("pointsAwarded", completion.pointsAwarded);
+            data.put("completedAt", completion.completedAt);
+            data.put("updatedAt", FieldValue.serverTimestamp());
+            batch.set(ref, data);
+            writes++;
+        }
+
+        UserPoints points = dao.getUserPoints(uid);
+        if (points != null) {
+            DocumentReference ref = firestore.collection("users")
+                    .document(uid)
+                    .collection("challenge_progress")
+                    .document("points_summary");
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("totalPoints", points.totalPoints);
+            data.put("updatedAt", FieldValue.serverTimestamp());
+            batch.set(ref, data);
+            writes++;
+        }
+
+        return writes;
+    }
+
     private static void putIfNotBlank(Map<String, Object> data, String key, String value) {
         if (value != null && !value.trim().isEmpty()) {
             data.put(key, value);

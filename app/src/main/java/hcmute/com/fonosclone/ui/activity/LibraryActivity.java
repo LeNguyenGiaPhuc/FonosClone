@@ -1,6 +1,7 @@
 package hcmute.com.fonosclone.ui.activity;
 
 
+import hcmute.com.fonosclone.auth.UserIdentity;
 import hcmute.com.fonosclone.data.local.AppDatabase;
 import hcmute.com.fonosclone.data.local.FonosDao;
 import hcmute.com.fonosclone.data.model.Book;
@@ -110,14 +111,15 @@ public class LibraryActivity extends BaseActivity {
         new Thread(() -> {
             AppDatabase db = AppDatabase.getInstance(getApplicationContext());
             FonosDao dao = db.fonosDao();
+            String userId = UserIdentity.getCurrentUserId(getApplicationContext());
             List<Book> books = new ArrayList<>();
 
             if (activeTab == TAB_DOWNLOADED) {
-                books = dao.getDownloadedBooks();
+                books = dao.getDownloadedBooks(userId);
             } else if (activeTab == TAB_PURCHASED) {
-                books = dao.getBooksByType("EBOOK");
+                books = dao.getBooksByTypeForUser("EBOOK", userId);
             } else if (activeTab == TAB_FAVORITE) {
-                books = dao.getFavoriteBooks();
+                books = dao.getFavoriteBooks(userId);
             }
 
             final List<Book> finalBooks = books;

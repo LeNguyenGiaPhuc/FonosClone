@@ -1,9 +1,9 @@
 package hcmute.com.fonosclone.data.local;
 
-
 import hcmute.com.fonosclone.data.model.Book;
 import hcmute.com.fonosclone.data.model.ChallengeCompletion;
 import hcmute.com.fonosclone.data.model.DownloadedContent;
+import hcmute.com.fonosclone.data.model.FavoriteContent;
 import hcmute.com.fonosclone.data.model.ListeningHistory;
 import hcmute.com.fonosclone.data.model.ListeningProgress;
 import hcmute.com.fonosclone.data.model.PodCourse;
@@ -13,10 +13,19 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+
 import java.util.List;
 
 @Dao
 public interface FonosDao {
+    String BOOK_SELECT_FOR_USER =
+            "SELECT b.id, b.title, b.author, b.type, b.coverImage, b.audioResName, " +
+                    "b.audioUrl, b.audioStoragePath, " +
+                    "CASE WHEN f.bookId IS NULL THEN 0 ELSE 1 END AS isFavorite, " +
+                    "b.category " +
+                    "FROM books b " +
+                    "LEFT JOIN favorite_content f ON f.bookId = b.id AND f.userId = :userId ";
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertBook(Book book);
 
@@ -44,44 +53,65 @@ public interface FonosDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void upsertDownloadedContent(DownloadedContent content);
 
-    @Query("SELECT COALESCE(SUM(listenedSeconds), 0) FROM listening_history")
-    int getTotalListenedSeconds();
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void upsertFavoriteContent(FavoriteContent favorite);
 
-    @Query("SELECT COALESCE(SUM(listenedSeconds), 0) FROM listening_history WHERE listenedAt BETWEEN :startMillis AND :endMillis")
-    int getListenedSecondsBetween(long startMillis, long endMillis);
+    @Query("DELETE FROM favorite_content WHERE userId = :userId AND bookId = :bookId")
+    void deleteFavoriteContent(String userId, int bookId);
 
-    @Query("SELECT * FROM listening_history WHERE listenedAt BETWEEN :startMillis AND :endMillis")
-    List<ListeningHistory> getListeningHistoryBetween(long startMillis, long endMillis);
+    @Query("DELETE FROM favorite_content WHERE userId = :userId")
+    void clearFavoriteContentForUser(String userId);
 
-    @Query("SELECT COUNT(*) FROM listening_progress WHERE durationMs > 0 AND positionMs >= durationMs * 9 / 10 AND updatedAt BETWEEN :startMillis AND :endMillis")
-    int countCompletedBooksBetween(long startMillis, long endMillis);
+    @Query("SELECT COALESCE(SUM(listenedSeconds), 0) FROM listening_history WHERE userId = :userId")
+    int getTotalListenedSeconds(String userId);
 
-    @Query("SELECT COUNT(*) FROM challenge_completions WHERE missionId = :missionId AND periodKey = :periodKey")
-    int isMissionCompleted(String missionId, String periodKey);
+    @Query("SELECT COALESCE(SUM(listenedSeconds), 0) FROM listening_history WHERE userId = :userId AND listenedAt BETWEEN :startMillis AND :endMillis")
+    int getListenedSecondsBetween(String userId, long startMillis, long endMillis);
 
-    @Query("SELECT COALESCE(SUM(pointsAwarded), 0) FROM challenge_completions")
-    int getTotalAwardedPoints();
+    @Query("SELECT * FROM listening_history WHERE userId = :userId AND listenedAt BETWEEN :startMillis AND :endMillis")
+    List<ListeningHistory> getListeningHistoryBetween(String userId, long startMillis, long endMillis);
 
-    @Query("SELECT * FROM user_points WHERE id = 1 LIMIT 1")
-    UserPoints getUserPoints();
+    @Query("SELECT * FROM listening_history WHERE userId = :userId ORDER BY listenedAt DESC")
+    List<ListeningHistory> getListeningHistoryForUser(String userId);
 
-    @Query("SELECT * FROM listening_progress WHERE bookId = :bookId LIMIT 1")
-    ListeningProgress getListeningProgress(int bookId);
+    @Query("SELECT COUNT(*) FROM listening_progress WHERE userId = :userId AND durationMs > 0 AND positionMs >= durationMs * 9 / 10 AND updatedAt BETWEEN :startMillis AND :endMillis")
+    int countCompletedBooksBetween(String userId, long startMillis, long endMillis);
 
-    @Query("SELECT * FROM listening_progress ORDER BY updatedAt DESC LIMIT 1")
-    ListeningProgress getLatestListeningProgress();
+    @Query("SELECT COUNT(*) FROM challenge_completions WHERE userId = :userId AND missionId = :missionId AND periodKey = :periodKey")
+    int isMissionCompleted(String userId, String missionId, String periodKey);
 
-    @Query("SELECT * FROM listening_progress")
-    List<ListeningProgress> getAllListeningProgress();
+    @Query("SELECT COALESCE(SUM(pointsAwarded), 0) FROM challenge_completions WHERE userId = :userId")
+    int getTotalAwardedPoints(String userId);
+
+    @Query("SELECT * FROM challenge_completions WHERE userId = :userId")
+    List<ChallengeCompletion> getChallengeCompletions(String userId);
+
+    @Query("SELECT * FROM user_points WHERE userId = :userId LIMIT 1")
+    UserPoints getUserPoints(String userId);
+
+    @Query("SELECT * FROM listening_progress WHERE userId = :userId AND bookId = :bookId LIMIT 1")
+    ListeningProgress getListeningProgress(String userId, int bookId);
+
+    @Query("SELECT * FROM listening_progress WHERE userId = :userId ORDER BY updatedAt DESC LIMIT 1")
+    ListeningProgress getLatestListeningProgress(String userId);
+
+    @Query("SELECT * FROM listening_progress WHERE userId = :userId")
+    List<ListeningProgress> getAllListeningProgress(String userId);
 
     @Query("SELECT COUNT(*) FROM books")
     int countBooks();
 
-    @Query("UPDATE books SET isFavorite = :isFavorite WHERE id = :bookId")
-    void setFavorite(int bookId, boolean isFavorite);
+    @Query(BOOK_SELECT_FOR_USER + "WHERE b.type = :type")
+    List<Book> getBooksByTypeForUser(String type, String userId);
 
-    @Query("UPDATE books SET isFavorite = 0")
-    void clearBookFavorites();
+    @Query(BOOK_SELECT_FOR_USER)
+    List<Book> getAllBooksForUser(String userId);
+
+    @Query(BOOK_SELECT_FOR_USER + "WHERE b.title LIKE '%' || :keyword || '%' OR b.author LIKE '%' || :keyword || '%'")
+    List<Book> searchBooksForUser(String keyword, String userId);
+
+    @Query(BOOK_SELECT_FOR_USER + "WHERE b.id = :bookId LIMIT 1")
+    Book getBookByIdForUser(int bookId, String userId);
 
     @Query("SELECT * FROM books WHERE type = :type")
     List<Book> getBooksByType(String type);
@@ -95,20 +125,20 @@ public interface FonosDao {
     @Query("SELECT * FROM books WHERE id = :bookId LIMIT 1")
     Book getBookById(int bookId);
 
-    @Query("SELECT * FROM books WHERE isFavorite = 1")
-    List<Book> getFavoriteBooks();
+    @Query(BOOK_SELECT_FOR_USER + "WHERE f.bookId IS NOT NULL")
+    List<Book> getFavoriteBooks(String userId);
 
-    @Query("SELECT books.* FROM books INNER JOIN downloaded_content ON books.id = downloaded_content.bookId ORDER BY downloaded_content.downloadedAt DESC")
-    List<Book> getDownloadedBooks();
+    @Query(BOOK_SELECT_FOR_USER + "INNER JOIN downloaded_content d ON b.id = d.bookId AND d.userId = :userId ORDER BY d.downloadedAt DESC")
+    List<Book> getDownloadedBooks(String userId);
 
-    @Query("SELECT COUNT(*) FROM downloaded_content WHERE bookId = :bookId")
-    int isBookDownloaded(int bookId);
+    @Query("SELECT COUNT(*) FROM downloaded_content WHERE userId = :userId AND bookId = :bookId")
+    int isBookDownloaded(String userId, int bookId);
 
-    @Query("SELECT * FROM downloaded_content")
-    List<DownloadedContent> getDownloadedContents();
+    @Query("SELECT * FROM downloaded_content WHERE userId = :userId")
+    List<DownloadedContent> getDownloadedContents(String userId);
 
-    @Query("SELECT * FROM downloaded_content WHERE bookId = :bookId LIMIT 1")
-    DownloadedContent getDownloadedContent(int bookId);
+    @Query("SELECT * FROM downloaded_content WHERE userId = :userId AND bookId = :bookId LIMIT 1")
+    DownloadedContent getDownloadedContent(String userId, int bookId);
 
     @Query("SELECT * FROM pod_courses")
     List<PodCourse> getPodCourses();

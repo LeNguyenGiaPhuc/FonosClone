@@ -1,9 +1,11 @@
 package hcmute.com.fonosclone.data.repository;
 
 
+import hcmute.com.fonosclone.auth.UserIdentity;
 import hcmute.com.fonosclone.data.local.AppDatabase;
 import hcmute.com.fonosclone.data.local.FonosDao;
 import hcmute.com.fonosclone.data.model.Book;
+import hcmute.com.fonosclone.data.model.FavoriteContent;
 import hcmute.com.fonosclone.data.model.ListeningProgress;
 import hcmute.com.fonosclone.data.model.PodCourse;
 
@@ -30,6 +32,7 @@ public final class FonosRepository {
     private final FonosDao dao;
     private final FirebaseFirestore firestore;
     private final Handler mainHandler;
+    private final Context appContext;
 
     public interface SyncCallback {
         void onSuccess();
@@ -37,6 +40,7 @@ public final class FonosRepository {
     }
 
     public FonosRepository(Context context) {
+        this.appContext = context.getApplicationContext();
         this.dao = AppDatabase.getInstance(context).fonosDao();
         this.firestore = FirebaseFirestore.getInstance();
         this.mainHandler = new Handler(Looper.getMainLooper());
@@ -144,6 +148,7 @@ public final class FonosRepository {
 
     public void syncFavoritesForCurrentUser(final SyncCallback callback) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String localUserId = UserIdentity.getCurrentUserId(appContext);
         if (user == null) {
             mainHandler.post(callback::onSuccess);
             return;
@@ -171,9 +176,13 @@ public final class FonosRepository {
 
                     new Thread(() -> {
                         try {
-                            dao.clearBookFavorites();
+                            dao.clearFavoriteContentForUser(localUserId);
                             for (Integer bookId : favoriteBookIds) {
-                                dao.setFavorite(bookId, true);
+                                dao.upsertFavoriteContent(new FavoriteContent(
+                                        localUserId,
+                                        bookId,
+                                        System.currentTimeMillis()
+                                ));
                             }
                             mainHandler.post(callback::onSuccess);
                         } catch (Exception e) {
@@ -189,9 +198,18 @@ public final class FonosRepository {
     }
 
     public void setFavoriteForCurrentUser(Book book, boolean isFavorite, final SyncCallback callback) {
+        String localUserId = UserIdentity.getCurrentUserId(appContext);
         new Thread(() -> {
             try {
-                dao.setFavorite(book.id, isFavorite);
+                if (isFavorite) {
+                    dao.upsertFavoriteContent(new FavoriteContent(
+                            localUserId,
+                            book.id,
+                            System.currentTimeMillis()
+                    ));
+                } else {
+                    dao.deleteFavoriteContent(localUserId, book.id);
+                }
                 if (callback != null) {
                     mainHandler.post(callback::onSuccess);
                 }
@@ -237,6 +255,7 @@ public final class FonosRepository {
 
     public void syncListeningProgressForCurrentUser(final SyncCallback callback) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String localUserId = UserIdentity.getCurrentUserId(appContext);
         if (user == null) {
             mainHandler.post(callback::onSuccess);
             return;
@@ -270,6 +289,7 @@ public final class FonosRepository {
                                 ? updatedAtMillisLong
                                 : System.currentTimeMillis();
                         cloudProgress.add(new ListeningProgress(
+                                localUserId,
                                 bookIdLong.intValue(),
                                 positionMsLong.intValue(),
                                 durationMsLong.intValue(),
@@ -280,7 +300,7 @@ public final class FonosRepository {
                     new Thread(() -> {
                         try {
                             for (ListeningProgress progress : cloudProgress) {
-                                ListeningProgress localProgress = dao.getListeningProgress(progress.bookId);
+                                ListeningProgress localProgress = dao.getListeningProgress(localUserId, progress.bookId);
                                 if (localProgress == null || progress.updatedAt >= localProgress.updatedAt) {
                                     dao.upsertListeningProgress(progress);
                                 }

@@ -1,6 +1,7 @@
 package hcmute.com.fonosclone.ui.activity;
 
 
+import hcmute.com.fonosclone.auth.UserIdentity;
 import hcmute.com.fonosclone.data.local.AppDatabase;
 import hcmute.com.fonosclone.data.local.FonosDao;
 import hcmute.com.fonosclone.data.model.Book;
@@ -100,7 +101,7 @@ public class SearchActivity extends BaseActivity {
             }
 
             LinkedHashMap<String, Integer> categoryCounts = new LinkedHashMap<>();
-            List<Book> allBooks = dao.getAllBooks();
+            List<Book> allBooks = dao.getAllBooksForUser(UserIdentity.getCurrentUserId(getApplicationContext()));
             for (Book book : allBooks) {
                 String category = normalizeCategory(book.category);
                 if (category.isEmpty()) continue;
@@ -263,7 +264,7 @@ public class SearchActivity extends BaseActivity {
         isProgrammaticChange = false;
 
         new Thread(() -> {
-            List<Book> allBooks = dao.getAllBooks();
+            List<Book> allBooks = dao.getAllBooksForUser(UserIdentity.getCurrentUserId(getApplicationContext()));
             List<Book> filteredBooks = new ArrayList<>();
             for (Book book : allBooks) {
                 if (category.equals(normalizeCategory(book.category))) {
@@ -281,7 +282,7 @@ public class SearchActivity extends BaseActivity {
         if (tvResultsTitle != null) tvResultsTitle.setText("Kết quả cho: \"" + query + "\"");
 
         new Thread(() -> {
-            List<Book> results = dao.searchBooks(query);
+            List<Book> results = dao.searchBooksForUser(query, UserIdentity.getCurrentUserId(getApplicationContext()));
             runOnUiThread(() -> renderBookList(results));
         }).start();
     }
