@@ -3,17 +3,11 @@ package hcmute.com.fonosclone.ui.activity;
 
 import hcmute.com.fonosclone.auth.UserIdentity;
 import hcmute.com.fonosclone.data.local.AppDatabase;
-import hcmute.com.fonosclone.data.local.FonosDao;
-import hcmute.com.fonosclone.data.model.Book;
 import hcmute.com.fonosclone.data.model.DownloadedContent;
-import hcmute.com.fonosclone.data.model.ListeningHistory;
 import hcmute.com.fonosclone.data.model.ListeningProgress;
-import hcmute.com.fonosclone.data.model.PodCourse;
-import hcmute.com.fonosclone.data.repository.FonosRepository;
 import hcmute.com.fonosclone.R;
 import hcmute.com.fonosclone.service.AudioPlayerService;
 import hcmute.com.fonosclone.service.ContentDownloadService;
-import hcmute.com.fonosclone.sync.SyncScheduler;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -52,12 +46,10 @@ public class PlayerActivity extends BaseActivity {
     private boolean isPlaying;
     private int currentPositionMs;
     private int currentDurationMs;
-    private int lastSavedPositionMs;
     private SeekBar progressBar;
     private TextView timeView;
     private Button playPauseButton;
     private Button downloadButton;
-    private FonosRepository repository;
     private boolean hasDownloadedAudio;
     private boolean isDownloadStateLoaded;
 
@@ -65,6 +57,9 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (!AudioPlayerService.ACTION_PROGRESS.equals(intent.getAction())) return;
+
+            int progressBookId = intent.getIntExtra(AudioPlayerService.EXTRA_BOOK_ID, 0);
+            if (progressBookId != bookId) return;
 
             currentPositionMs = intent.getIntExtra(AudioPlayerService.EXTRA_POSITION_MS, 0);
             currentDurationMs = intent.getIntExtra(AudioPlayerService.EXTRA_DURATION_MS, 0);
@@ -130,11 +125,9 @@ public class PlayerActivity extends BaseActivity {
         audioStoragePath = getIntent().getStringExtra(AudioPlayerService.EXTRA_AUDIO_STORAGE_PATH);
         bookId = getIntent().getIntExtra(EXTRA_BOOK_ID, 0);
         currentPositionMs = getIntent().getIntExtra(AudioPlayerService.EXTRA_START_POSITION_MS, 0);
-        lastSavedPositionMs = currentPositionMs;
         coverImage = getIntent().getStringExtra("cover_image");
         String coverColor = getIntent().getStringExtra("cover_color");
         String coverEmoji = getIntent().getStringExtra("cover_emoji");
-        repository = new FonosRepository(this);
 
         TextView titleView = findViewById(R.id.tvPlayerTitle);
         TextView authorView = findViewById(R.id.tvPlayerAuthor);
@@ -178,8 +171,6 @@ public class PlayerActivity extends BaseActivity {
 
         playPauseButton.setOnClickListener(v -> {
             if (isPlaying) {
-                saveListeningProgress();
-                savePlaybackSnapshot(false);
                 pauseAudio();
                 playPauseButton.setText(R.string.play);
                 isPlaying = false;
@@ -189,11 +180,8 @@ public class PlayerActivity extends BaseActivity {
         });
 
         stopButton.setOnClickListener(v -> {
-            saveListeningProgress();
-            savePlaybackSnapshot(true);
             stopAudio();
             currentPositionMs = 0;
-            lastSavedPositionMs = 0;
             updateProgressUi();
             playPauseButton.setText(R.string.play);
             isPlaying = false;
@@ -286,6 +274,7 @@ public class PlayerActivity extends BaseActivity {
         intent.putExtra(AudioPlayerService.EXTRA_AUDIO_RES, audioResName);
         intent.putExtra(AudioPlayerService.EXTRA_AUDIO_URL, audioUrl);
         intent.putExtra(AudioPlayerService.EXTRA_AUDIO_STORAGE_PATH, audioStoragePath);
+        intent.putExtra(AudioPlayerService.EXTRA_COVER_IMAGE, coverImage);
         intent.putExtra(AudioPlayerService.EXTRA_BOOK_ID, bookId);
         intent.putExtra(AudioPlayerService.EXTRA_START_POSITION_MS, currentPositionMs);
 
@@ -318,8 +307,6 @@ public class PlayerActivity extends BaseActivity {
     }
 
     private void closePlayer() {
-        saveListeningProgress();
-        savePlaybackSnapshot(false);
         finish();
     }
 
@@ -352,52 +339,6 @@ public class PlayerActivity extends BaseActivity {
         return String.format(Locale.US, "%02d:%02d", minutes, seconds);
     }
 
-    private void saveListeningProgress() {
-        if (bookId <= 0 || currentPositionMs <= lastSavedPositionMs) return;
-
-        int deltaSeconds = (currentPositionMs - lastSavedPositionMs) / 1000;
-        if (deltaSeconds <= 0) return;
-
-        lastSavedPositionMs += deltaSeconds * 1000;
-        new Thread(() -> AppDatabase
-                .getInstance(getApplicationContext())
-                .fonosDao()
-                .insertListeningHistory(new ListeningHistory(
-                        UserIdentity.getCurrentUserId(getApplicationContext()),
-                        bookId,
-                        deltaSeconds,
-                        System.currentTimeMillis()
-                ))
-        ).start();
-    }
-
-    private void savePlaybackSnapshot(boolean resetPosition) {
-        if (bookId <= 0) return;
-
-        int savedPositionMs = resetPosition ? 0 : Math.max(0, currentPositionMs);
-        int savedDurationMs = Math.max(0, currentDurationMs);
-        repository.saveListeningProgressForCurrentUser(
-                bookId,
-                title,
-                author,
-                coverImage,
-                savedPositionMs,
-                savedDurationMs
-        );
-        new Thread(() -> AppDatabase
-                .getInstance(getApplicationContext())
-                .fonosDao()
-                .upsertListeningProgress(new ListeningProgress(
-                        UserIdentity.getCurrentUserId(getApplicationContext()),
-                        bookId,
-                        savedPositionMs,
-                        savedDurationMs,
-                        System.currentTimeMillis()
-                ))
-        ).start();
-        SyncScheduler.enqueueUserSync(this);
-    }
-
     private void loadSavedProgress() {
         if (bookId <= 0) return;
 
@@ -412,7 +353,6 @@ public class PlayerActivity extends BaseActivity {
             runOnUiThread(() -> {
                 currentPositionMs = progress.positionMs;
                 currentDurationMs = progress.durationMs;
-                lastSavedPositionMs = progress.positionMs;
                 updateProgressUi();
             });
         }).start();

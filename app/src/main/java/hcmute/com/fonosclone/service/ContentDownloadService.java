@@ -224,16 +224,7 @@ public class ContentDownloadService extends Service {
             workerRunning = false;
         }
 
-        Notification finalNotification = buildNotification(true);
-        if (cancelled) {
-            stopForeground(true);
-        } else {
-            detachForegroundNotification();
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            if (manager != null) {
-                manager.notify(NOTIFICATION_ID, finalNotification);
-            }
-        }
+        clearDownloadNotification();
         stopSelf();
     }
 
@@ -367,7 +358,9 @@ public class ContentDownloadService extends Service {
         item.status = STATUS_COMPLETED;
         markContentDownloaded(item);
         sendProgressBroadcast(item);
-        updateNotification(false);
+        if (hasActiveOrQueuedDownloads()) {
+            updateNotification(false);
+        }
     }
 
     private void failDownload(DownloadItem item, Exception e) {
@@ -396,8 +389,27 @@ public class ContentDownloadService extends Service {
                 }
             }
         }
-        stopForeground(true);
+        clearDownloadNotification();
         stopSelf();
+    }
+
+    private boolean hasActiveOrQueuedDownloads() {
+        synchronized (lock) {
+            for (DownloadItem item : downloads.values()) {
+                if (STATUS_QUEUED.equals(item.status) || STATUS_RUNNING.equals(item.status)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void clearDownloadNotification() {
+        stopForeground(true);
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        if (manager != null) {
+            manager.cancel(NOTIFICATION_ID);
+        }
     }
 
     private void updateNotification(boolean finished) {
