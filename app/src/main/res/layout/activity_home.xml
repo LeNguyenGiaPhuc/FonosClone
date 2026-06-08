@@ -24,11 +24,10 @@
             <ImageView
                 android:layout_width="46dp"
                 android:layout_height="46dp"
-                android:background="@drawable/circle_white"
+                android:background="@drawable/circle_logo_bg"
                 android:contentDescription="@string/logo_desc"
-                android:padding="9dp"
-                android:src="@android:drawable/ic_media_play"
-                app:tint="#F07830" />
+                android:padding="7dp"
+                android:src="@drawable/ic_launcher_foreground" />
 
             <LinearLayout
                 android:layout_width="0dp"
